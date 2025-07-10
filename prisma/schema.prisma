@@ -15,18 +15,107 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
         
-
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  Int?
+enum ReviewStatus {
+  DRAFT
+  COMPLETED
+  PENDING
+  APPROVED
 }
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TEXT
+  NUMERIC
+  FILE_UPLOAD
+  DATE
+  BOOLEAN
+}
+
+
+
+
+model Vendor {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String   @unique
+  address   String
+  phone_no  String
+  industry  String?
+  website   String?
+  riskScore Int      @default(0)
+  //Add certifications here 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviews   VendorReview[]
+}
+
+
+
+model VendorReview {
+  id              String      @id @default(uuid()) @db.Uuid
+  vendorId        String      @db.Uuid  
+  vendor          Vendor      @relation(fields: [vendorId], references: [id])
+  
+  lastReviewDate  DateTime
+  nextReviewDate  DateTime
+  status          ReviewStatus @default(DRAFT)
+  reviewScore     Int?
+  reviewNotes     String?
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  answers         Answer[]
+}
+model Question {
+  id           String       @id @default(uuid()) @db.Uuid
+  questionText String
+  category     String
+  questionType QuestionType
+  weight       Float        @default(1.0)
+  isMandatory  Boolean      @default(false)
+  options      String[]     // For multiple choice questions, if not then just pass in []
+  isActive     Boolean      @default(true)  // To softdelete in case in the future we want to look back at old questions
+
+  answers      Answer[]
+}
+
+
+
+model Answer {
+  id         String   @id @default(uuid()) @db.Uuid
+  reviewId   String   @db.Uuid  
+  review     VendorReview @relation(fields: [reviewId], references: [id])
+  score      Int?
+
+  questionId String   @db.Uuid  
+  question   Question @relation(fields: [questionId], references: [id])
+  
+
+  //NOTE: In the future can probably use JSON to store complex answer format, but for now using nullable fields is fine. Queries will be a bit more complex.
+   // For SINGLE_CHOICE
+  selectedOptionId String?
+
+  // For MULTIPLE_CHOICE
+  selectedOptionIds String[]
+
+  // For TEXT
+  textValue      String?
+
+  // For NUMERIC
+  numericValue   Float?
+
+  // For FILE_UPLOAD
+  fileUrl        String?
+
+  // For DATE
+  dateValue      DateTime?
+
+  // For BOOLEAN
+  booleanValue   Boolean?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

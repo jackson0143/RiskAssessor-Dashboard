@@ -1,4 +1,4 @@
-import {  Home,  Search, Settings } from "lucide-react"
+import {  Home,  Search, Settings,HousePlus  } from "lucide-react"
 
 import { ModeToggle } from "@/components/mode-toggle"
 import {
@@ -30,8 +30,8 @@ const items = [
   },
   {
     title: "Add vendor",
-    url: "/vendors",
-    icon: Settings,
+    url: "/addvendor",
+    icon: HousePlus,
   },
   {
     title: "Settings",

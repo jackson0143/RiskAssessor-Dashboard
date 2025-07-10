@@ -3,31 +3,48 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export async function searchUsers(searchTerm: string) {
+export async function searchVendors(searchTerm: string) {
   try {
-    const users = await prisma.user.findMany({
+    const vendors = await prisma.vendor.findMany({
       where: {
         OR: [
           { name: { contains: searchTerm, mode: 'insensitive' } },
           { email: { contains: searchTerm, mode: 'insensitive' } },
+          { phone_no: { contains: searchTerm, mode: 'insensitive' } },
         ],
       },    
-
-      take:20
+      take: 20
     });
-    return { success: true, users };
+    return { success: true, vendors };
   } catch (error) {
-    console.error('Error searching users:', error);
-    return { success: false, error: 'Failed to search users' };
+    console.error('Error searching vendors:', error);
+    return { success: false, error: 'Failed to search vendors' };
   }
 }
 
-export async function getAllUsers() {
+export async function getAllVendors() {
   try {
-    const users = await prisma.user.findMany();
-    return { success: true, users };
+    const vendors = await prisma.vendor.findMany();
+    return { success: true, vendors };
   } catch (error) {
-    console.error('Error fetching users:', error);
-    return { success: false, error: 'Failed to fetch users' };
+    console.error('Error fetching vendors:', error);
+    return { success: false, error: 'Failed to fetch vendors' };
+  }
+}
+
+export async function getVendorById(vendorId: string) {
+  try {
+    const vendor = await prisma.vendor.findUnique({
+      where: {
+        id: vendorId,
+      },
+      include: {
+        reviews: true,
+      },
+    });
+    return { success: true, vendor };
+  } catch (error) {
+    console.error('Error fetching vendor:', error);
+    return { success: false, error: 'Failed to fetch vendor' };
   }
 }

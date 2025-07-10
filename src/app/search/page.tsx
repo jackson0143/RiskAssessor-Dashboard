@@ -4,14 +4,22 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { ChevronDown } from "lucide-react"
-import { getAllUsers, searchUsers } from './actions';
+import { getAllVendors, searchVendors } from './actions';
 import { useState, useEffect } from 'react';
 import useDebounce from '@/hooks/useDebounce';
 import { VendorCard } from '@/components/vendor-card';
+
 interface Vendor {
-  id: number;
-  name: string | null;
+  id: string;
+  name: string;
   email: string;
+  address: string;
+  phone_no: string;
+  industry: string | null;
+  website: string | null;
+  riskScore: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 //This is a bit more advanced, it uses a hook to delay the search until the user stops typing
 //Feel free to ignore this, it's not important for the project
@@ -39,9 +47,9 @@ export default function Search() {
     setLoading(true);
     setError(null);
     try {
-      const result = await getAllUsers();
-      if (result.success && result.users) {
-        setVendors(result.users);
+      const result = await getAllVendors();
+      if (result.success && result.vendors) {
+        setVendors(result.vendors);
       } else {
         setError('Failed to load vendors');
       }
@@ -51,14 +59,14 @@ export default function Search() {
     }
     setLoading(false);
   };
-//handle searching the vendors/users
+//handle searching the vendors
   const handleSearch = async (term: string) => {
     setLoading(true);
     setError(null);
     try {
-      const { success, users } = await searchUsers(term);
-      if (success && users) {
-        setVendors(users);
+      const { success, vendors } = await searchVendors(term);
+      if (success && vendors) {
+        setVendors(vendors);
       } else {
         setError('Failed to search vendors');
       }
