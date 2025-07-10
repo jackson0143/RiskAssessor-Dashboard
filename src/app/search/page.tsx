@@ -2,12 +2,12 @@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { ChevronDown } from "lucide-react"
 import { getAllUsers, searchUsers } from './actions';
 import { useState, useEffect } from 'react';
 import useDebounce from '@/hooks/useDebounce';
+import { VendorCard } from '@/components/vendor-card';
 interface Vendor {
   id: number;
   name: string | null;
@@ -151,7 +151,6 @@ export default function Search() {
 
       {/* Results Section */}
       <div>
-        {/* Results Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Search Results</h2>
           <span className="text-gray-600">
@@ -182,23 +181,7 @@ export default function Search() {
             <div className="space-y-4">
               {currentVendors.length > 0 ? (
                 currentVendors.map((vendor) => (
-                  <Card key={vendor.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                      <div>
-                        <CardTitle className="text-lg">{vendor.name || 'Unnamed Vendor'}</CardTitle>
-                        <p className="text-gray-600 text-sm">{vendor.email}</p>
-                        <div className="flex gap-2 mt-2">
-                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Active</span>
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Vendor</span>
-                        </div>
-                      </div>
-                      {/* Badges for the vendor*/}
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="sm">View</Button>
-                        <Button variant="ghost" size="sm">Edit</Button>
-                      </div>
-                    </CardHeader>
-                  </Card>
+                  <VendorCard key={vendor.id} vendor={vendor} />
                 ))
               ) : (
                 <div className="text-center py-12 text-gray-500">
@@ -221,14 +204,14 @@ export default function Search() {
                     </PaginationItem>
                     
                     {/* Simple 0-based indexing */}
-                    {[...Array(totalPages)].map((_, index) => (
-                      <PaginationItem key={index}>
+                    {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                      <PaginationItem key={page}>
                         <PaginationLink
-                          onClick={() => handlePageChange(index)}
-                          isActive={pagination.pageIndex === index}
+                          onClick={() => handlePageChange(page - 1)}
+                          isActive={pagination.pageIndex === page - 1}
                           className="cursor-pointer"
                         >
-                          {index + 1}
+                          {page}
                         </PaginationLink>
                       </PaginationItem>
                     ))}
