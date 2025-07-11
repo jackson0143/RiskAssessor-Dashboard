@@ -23,11 +23,14 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Setting up Environment Variables
 
-Environment variables are like secret keys and passwords we want to create and keep hidden to ensure no one else besides the developers can utilise them. To start, create a '.env' file in the **main** folder (where your src, public, etc are). Then paste in the environment variables from the stored secret location.
+Environment variables are like secret keys and passwords we want to create and keep hidden to ensure no one else besides the developers can utilise them. 
 
-OR
 
-paste in the .env file directly 
+To start, head to the secret Google Drive and download the .env file there. Then paste in the .env file directly in the **main** folder (where your src, public, etc are).
+
+OR 
+
+just create your .env file there and paste in the DB key
 
 (please message me if you need help on this step)
 
