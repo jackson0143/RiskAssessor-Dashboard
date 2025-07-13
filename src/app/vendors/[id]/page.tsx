@@ -2,9 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { getVendorById } from "@/app/search/actions"
+import { getVendorById } from "@/app/vendors/actions"
 import { Badge } from "@/components/ui/badge"
-
+import { SectionCards } from "@/components/section-cards"
+import { ChartBarMixed } from "@/components/bar-chart"
 interface VendorDetailPageProps {
   params: Promise<{
     id: string
@@ -22,10 +23,10 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
     return (
       <div className="p-6 w-full">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/search">
+          <Link href="/vendors">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Search
+              Back
             </Button>
           </Link>
         </div>
@@ -38,13 +39,13 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
   }
 
   return (
-    <div className="p-6 w-full">
-      {/* Header with back button */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link href="/search">
+    <div className="p-6 w-full space-y-8">
+      {/* Header Section */}
+      <div className="flex items-center gap-4">
+        <Link href="/vendors">
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Search
+            Back
           </Button>
         </Link>
         <div>
@@ -53,7 +54,34 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
         </div>
       </div>
 
-      {/* Vendor Information */}
+      {/* Risk Assessment Dashboard Section */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Risk Assessment Overview</h2>
+        <SectionCards 
+          overallRiskScore={vendor.riskScore}
+          cyberResilienceRating={82} 
+          securityControlCompliance={68} 
+          incidentResponseCapability={91} 
+        />
+      </div>
+
+      {/* bar chart here */}
+      <div>
+      
+        <div className="grid grid-cols-1 lg:grid-cols-20 gap-6">
+          <div className="lg:col-span-13">
+            <ChartBarMixed />
+          </div>
+          <div className="lg:col-span-7">
+            {/* reserved space any charts later */}
+            <div className="h-full min-h-[80px] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+              <p className="text-gray-500 text-sm">Add whatever chart here if necessary</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/*Vendor reviews can go here*/}
+      {/* Vendor Information Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -132,11 +160,14 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
 
 
 
-      {/* Actions */}
-      <div className="mt-6 flex gap-4">
-        <Button>Edit Vendor</Button>
-        <Button variant="outline">Download Information</Button>
-        {/* <Button variant="destructive">Delete Vendor</Button> */}
+      {/* Actions Section */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Actions</h2>
+        <div className="flex gap-4">
+          <Button>Edit Vendor</Button>
+          <Button variant="outline">Download Information</Button>
+          {/* <Button variant="destructive">Delete Vendor</Button> */}
+        </div>
       </div>
     </div>
   )

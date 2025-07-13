@@ -79,6 +79,9 @@ model Question {
   options      String[]     // For multiple choice questions, if not then just pass in []
   isActive     Boolean      @default(true)  // To softdelete in case in the future we want to look back at old questions
 
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   answers      Answer[]
 }
 

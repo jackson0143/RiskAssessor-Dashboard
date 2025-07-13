@@ -1,6 +1,8 @@
 'use server';
 
 import { PrismaClient } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
+
 const prisma = new PrismaClient();
 
 export async function searchVendors(searchTerm: string) {
@@ -25,6 +27,8 @@ export async function searchVendors(searchTerm: string) {
 export async function getAllVendors() {
   try {
     const vendors = await prisma.vendor.findMany();
+    revalidatePath('/search');
+  
     return { success: true, vendors };
   } catch (error) {
     console.error('Error fetching vendors:', error);

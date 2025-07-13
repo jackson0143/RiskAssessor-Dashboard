@@ -13,7 +13,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { deleteVendor } from '../addvendor/actions';
+import { deleteVendor } from './actions';
 import { useState } from 'react';
 import { AlertCircleIcon} from 'lucide-react'
 //NEED TO ADD AUTH IN THE FUTURE

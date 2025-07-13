@@ -1,6 +1,6 @@
 import DeleteVendorButton from './DeleteVendorButton';
 import AddVendorForm from './AddVendorForm';
-import { getAllVendors } from '../search/actions';
+import { getAllVendors } from './actions';
 
 export default async function Vendors() {
     const { success, vendors } = await getAllVendors();

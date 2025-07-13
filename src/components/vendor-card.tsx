@@ -18,7 +18,7 @@ interface VendorCardProps {
 
 export function VendorCard({ vendor }: VendorCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow bg-slate-50/80 dark:bg-neutral-900">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div>
           <CardTitle className="text-lg">{vendor.name}</CardTitle>
@@ -35,7 +35,7 @@ export function VendorCard({ vendor }: VendorCardProps) {
           </div>
         </div>
         <div className="flex gap-2">
-          <Link href={`/vendor/${vendor.id}`}>
+          <Link href={`/vendors/${vendor.id}`}>
             <Button variant="ghost" size="default">View</Button>
           </Link>
           {/* <Button variant="ghost" size="sm">Edit</Button> */}

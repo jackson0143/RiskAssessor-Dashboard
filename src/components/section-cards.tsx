@@ -8,93 +8,145 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Shield, Zap, Lock, AlertTriangle } from "lucide-react"
 
+interface VendorStatsProps {
+  overallRiskScore: number;
+  cyberResilienceRating: number;
+  securityControlCompliance: number;
+  incidentResponseCapability: number;
+}
 
-export function SectionCards() {
+export function SectionCards({ 
+  overallRiskScore = 10,
+  cyberResilienceRating = 40,
+  securityControlCompliance = 75,
+  incidentResponseCapability = 100
+}: VendorStatsProps) {
+  
+  const getRiskColor = (score: number) => {
+    if (score >= 80) return '#10b981'; // Green
+    if (score >= 60) return '#f59e0b'; // Yellow
+    return '#ef4444'; // Red
+  };
+
+  const getRiskLabel = (score: number) => {
+    if (score >= 80) return 'Low Risk';
+    if (score >= 60) return 'Medium Risk';
+    return 'High Risk';
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      <Card className="@container/card">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Card >
         <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
+          <CardDescription className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Overall Risk Score
+          </CardDescription>
+          <CardTitle 
+            className="text-3xl font-semibold tabular-nums @[250px]/card:text-3xl"
+            style={{ color: getRiskColor(overallRiskScore) }}
+          >
+            {overallRiskScore}/100
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-       
-              +12.5%
+              {getRiskLabel(overallRiskScore)}
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month 
+            Comprehensive risk assessment
           </div>
           <div className="text-muted-foreground">
-            Visitors for the last 6 months
+            Based on all security metrics
           </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+          <CardDescription className="flex items-center gap-2 text-sm">
+            <Zap className="h-4 w-4" />
+            Cyber Resilience Rating
+          </CardDescription>
+          <CardTitle 
+            className="text-lg font-semibold tabular-nums"
+            style={{ color: getRiskColor(cyberResilienceRating) }}
+          >
+            {cyberResilienceRating}/100
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-             
-              -20%
+            <Badge variant="outline" className="text-xs">
+              {getRiskLabel(cyberResilienceRating)}
             </Badge>
           </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+        <CardFooter className="flex-col items-start gap-1.5 text-xs">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period 
+            Strong cyber defense posture
           </div>
           <div className="text-muted-foreground">
-            Acquisition needs attention
+            Recovery and adaptation capability
           </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
+          <CardDescription className="flex items-center gap-2 text-sm">
+            <Lock className="h-4 w-4" />
+            Security Control Compliance
+          </CardDescription>
+          <CardTitle 
+            className="text-lg font-semibold tabular-nums"
+            style={{ color: getRiskColor(securityControlCompliance) }}
+          >
+            {securityControlCompliance}/100
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-             
-              +12.5%
+            <Badge variant="outline" className="text-xs">
+              {getRiskLabel(securityControlCompliance)}
             </Badge>
           </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+        <CardFooter className="flex-col items-start gap-1.5 text-xs">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention 
+            Needs improvement in controls
           </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
+          <div className="text-muted-foreground">
+            Policy and procedure adherence
+          </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
+          <CardDescription className="flex items-center gap-2 text-sm">
+            <AlertTriangle className="h-4 w-4" />
+            Incident Response Capability
+          </CardDescription>
+          <CardTitle 
+            className="text-lg font-semibold tabular-nums"
+            style={{ color: getRiskColor(incidentResponseCapability) }}
+          >
+            {incidentResponseCapability}/100
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-             
-              +4.5%
+            <Badge variant="outline" className="text-xs">
+              {getRiskLabel(incidentResponseCapability)}
             </Badge>
           </CardAction>
         </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+        <CardFooter className="flex-col items-start gap-1.5 text-xs">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase 
+            Excellent response readiness
           </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
+          <div className="text-muted-foreground">
+            Quick detection and resolution
+          </div>
         </CardFooter>
       </Card>
     </div>

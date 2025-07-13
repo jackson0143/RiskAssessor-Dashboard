@@ -1,9 +1,11 @@
 'use client';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { ChevronDown } from "lucide-react"
+// import { ChevronDown } from "lucide-react"
+import { Plus } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 import { getAllVendors, searchVendors } from './actions';
 import { useState, useEffect } from 'react';
 import useDebounce from '@/hooks/useDebounce';
@@ -23,7 +25,7 @@ interface Vendor {
 }
 //This is a bit more advanced, it uses a hook to delay the search until the user stops typing
 //Feel free to ignore this, it's not important for the project
-export default function Search() {
+export default function Vendors() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +45,7 @@ export default function Search() {
   }, [debouncedSearchTerm]);
 
   //Load all vendors on mount, and when search is cleared
+  //check if we can make this a server sided component later 
   const loadAllVendors = async () => {
     setLoading(true);
     setError(null);
@@ -87,19 +90,31 @@ export default function Search() {
     setPagination(prev => ({ ...prev, pageIndex }));
   };
 
-  // Reset to page 0 when search changes
+ 
   useEffect(() => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, [debouncedSearchTerm]);
+
+
+  const clearFilter = () => {
+    setSearchTerm('');
+    setPagination(prev => ({ ...prev, pageIndex: 0 }));
+  };
 
 
 
   return (
     <div className="p-6 w-full">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Search Vendors</h1>
-        <p className="text-gray-600">Find and filter through all available vendors</p>
+      <div className="mb-6 flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">Vendors</h1>
+          <p className="text-gray-600">Find and search through all available vendors</p>
+        </div>
+        <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-500 dark:hover:bg-blue-600">
+          <Plus className="h-4 w-4" />
+          Add Vendor
+        </Button>
       </div>
 
    
@@ -117,7 +132,7 @@ export default function Search() {
 
         {/* Filters (implement later)*/}
         <div className="flex flex-wrap gap-4">
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 All Categories
@@ -145,13 +160,13 @@ export default function Search() {
               <DropdownMenuItem>Inactive</DropdownMenuItem>
               <DropdownMenuItem>Pending</DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
 
           <Button>
             Search
           </Button>
 
-          <Button variant="outline">
+          <Button variant="outline" onClick={clearFilter}>
             Clear Filters
           </Button>
         </div>
@@ -178,8 +193,27 @@ export default function Search() {
 
         {/* Loading state*/}
         {loading && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading vendors...</p>
+
+          //the skeleton is very cool
+          <div className="space-y-4">
+            {Array.from({ length: 3 }, (_, index) => (
+              <div key={index} className="bg-slate-50/80 dark:bg-neutral-900 rounded-lg border p-6">
+                <div className="flex flex-row items-start justify-between space-y-0 pb-2">
+                  <div className="space-y-3 flex-1">
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-4 w-64" />
+                    <Skeleton className="h-3 w-32" />
+                    <div className="flex gap-4 mt-2">
+                      <Skeleton className="h-6 w-20" />
+                      <Skeleton className="h-6 w-32" />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Skeleton className="h-9 w-16" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

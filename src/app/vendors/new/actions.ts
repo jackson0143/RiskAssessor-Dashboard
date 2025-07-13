@@ -6,7 +6,16 @@ import { revalidatePath } from 'next/cache';
 const prisma = new PrismaClient();
 
 
-
+export async function getAllVendors() {
+  try {
+    const vendors = await prisma.vendor.findMany();
+    
+    return { success: true, vendors };
+  } catch (error) {
+    console.error('Error fetching vendors:', error);
+    return { success: false, error: 'Failed to fetch vendors' };
+  }
+}
 export async function addVendor(vendorData: {
   name: string;
   email: string;
@@ -88,7 +97,7 @@ export async function updateVendor(vendorId: string, vendorData: {
     });
 
     revalidatePath('/addVendor');
-    revalidatePath(`/vendor/${vendorId}`);
+    revalidatePath(`/vendors/${vendorId}`);
 
     return { success: true, vendor };
   } catch (error) {
