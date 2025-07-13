@@ -20,7 +20,7 @@ export default async function QuestionsPage() {
 
   if (!result.success) {
     return (
-      <div className="p-6">
+      <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Questions</h1>
         <div className="text-red-500">Error loading questions: {result.error}</div>
       </div>
@@ -30,7 +30,7 @@ export default async function QuestionsPage() {
   const questions: Question[] = result.questions || [];
 
   return (
-    <div className="p-6 w-full">
+    <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Questions</h1>
       
       {questions.length === 0 ? (
@@ -42,32 +42,26 @@ export default async function QuestionsPage() {
           {questions.map((question) => (
             <Card key={question.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg mb-2">{question.questionText}</CardTitle>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline">{question.category}</Badge>
-                      <Badge variant="outline">{question.questionType}</Badge>
-                      <Badge variant="outline">
-                        {question.isMandatory ? "Mandatory" : "Optional"}
-                      </Badge>
-                      <Badge variant="destructive">Weight: {question.weight}</Badge>
-                    </div>
-                  </div>
+                <CardTitle className="text-lg mb-2">{question.questionText}</CardTitle>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline">{question.category}</Badge>
+                  <Badge variant="outline">{question.questionType}</Badge>
+                  <Badge variant="outline">
+                    {question.isMandatory ? "Mandatory" : "Optional"}
+                  </Badge>
+                  <Badge variant="destructive">Weight: {question.weight}</Badge>
                 </div>
               </CardHeader>
               
               {question.options.length > 0 && (
                 <CardContent>
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-muted-foreground">Options:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {question.options.map((option, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {option}
-                        </Badge>
-                      ))}
-                    </div>
+                  <h4 className="font-medium text-sm text-gray-500 mb-2">Options:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {question.options.map((option, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        {option}
+                      </Badge>
+                    ))}
                   </div>
                 </CardContent>
               )}

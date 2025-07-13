@@ -62,7 +62,7 @@ export default function Vendors() {
     }
     setLoading(false);
   };
-//handle searching the vendors
+
   const handleSearch = async (term: string) => {
     setLoading(true);
     setError(null);
@@ -90,34 +90,29 @@ export default function Vendors() {
     setPagination(prev => ({ ...prev, pageIndex }));
   };
 
- 
   useEffect(() => {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   }, [debouncedSearchTerm]);
-
 
   const clearFilter = () => {
     setSearchTerm('');
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   };
 
-
-
   return (
-    <div className="p-6 w-full">
+    <div className="p-4">
       {/* Header */}
       <div className="mb-6 flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-bold mb-2">Vendors</h1>
-          <p className="text-gray-600">Find and search through all available vendors</p>
+          <p className="text-gray-500">Find and search through all available vendors</p>
         </div>
-        <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-500 dark:hover:bg-blue-600">
+        <Button className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Add Vendor
         </Button>
       </div>
 
-   
       <div className='mb-8'>
         {/* Search Input */}
         <div className="mb-4">
@@ -176,14 +171,14 @@ export default function Vendors() {
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Search Results</h2>
-          <span className="text-gray-600">
+          <span className="text-gray-500">
             {loading ? 'Loading...' : `Showing ${currentVendors.length} of ${vendors.length} results`}
           </span>
         </div>
 
         {/* Error state*/}
         {error && (
-          <div className="text-center py-8 text-red-600">
+          <div className="text-center py-8 text-red-500">
             <p>{error}</p>
             <Button variant="outline" onClick={loadAllVendors} className="mt-2">
               Try Again
@@ -193,11 +188,9 @@ export default function Vendors() {
 
         {/* Loading state*/}
         {loading && (
-
-          //the skeleton is very cool
           <div className="space-y-4">
             {Array.from({ length: 3 }, (_, index) => (
-              <div key={index} className="bg-slate-50/80 dark:bg-neutral-900 rounded-lg border p-6">
+            <div key={index} className="bg-slate-50/80 dark:bg-neutral-900 rounded-lg border p-6">
                 <div className="flex flex-row items-start justify-between space-y-0 pb-2">
                   <div className="space-y-3 flex-1">
                     <Skeleton className="h-6 w-48" />
@@ -245,7 +238,6 @@ export default function Vendors() {
                       />
                     </PaginationItem>
                     
-                    {/* Simple 0-based indexing */}
                     {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
                       <PaginationItem key={page}>
                         <PaginationLink

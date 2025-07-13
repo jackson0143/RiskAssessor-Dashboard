@@ -21,33 +21,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-// Menu items.
 const items = [
   {
     title: "Home",
     url: "/home",
     icon: Home,
   },
- 
-
   {
     title: "Vendors",
     url: "/vendors",
     icon: Users,
   },
-  // {
-  //   title: "Add vendor",
-  //   url: "/addvendor",
-  //   icon: HousePlus,
-  // },
-  // {
-  //   title: "Settings",
-  //   url: "#",
-  //   icon: Settings,
-  // },
-
-
 ]
+
 const items2 = [
   {
     title: "Questions",
@@ -55,12 +41,11 @@ const items2 = [
     icon: HousePlus,
   },
 ]
+
 export function AppSidebar() {
   return (
-    <Sidebar collapsible="none" className="h-auto">
-
-
-<SidebarHeader>
+    <Sidebar collapsible="offcanvas" className="h-auto">
+      <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -76,11 +61,8 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
 
-
       <SidebarContent>
         <SidebarGroup>
-     
-
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -95,9 +77,7 @@ export function AppSidebar() {
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
-
         </SidebarGroup>
-
 
         <SidebarGroup>
           <SidebarGroupLabel>Form</SidebarGroupLabel>
@@ -129,11 +109,11 @@ export function AppSidebar() {
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
-
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="ml-auto">
-        <ModeToggle  />
+      
+      <SidebarFooter>
+        <ModeToggle />
       </SidebarFooter>
     </Sidebar>
   )
