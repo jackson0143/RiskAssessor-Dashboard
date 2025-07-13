@@ -23,7 +23,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            //defaultTheme="system"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
         >

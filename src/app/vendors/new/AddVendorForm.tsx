@@ -12,6 +12,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircleIcon } from 'lucide-react'
 
 //NEED TO ADD AUTH TO THIS IN THE FUTURE
+//TODO, use the zod schema to validate form (check shadcn docs for react form part)
+//check notifications (toast) and also alerts after submit
 export default function AddVendorForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -57,7 +59,7 @@ export default function AddVendorForm() {
   };
 
   return (
-    <Card className="mb-6 w-1/2">
+    <Card className="mb-6 w-full">
       <CardHeader>
         <CardTitle>Add New Vendor</CardTitle>
       </CardHeader>

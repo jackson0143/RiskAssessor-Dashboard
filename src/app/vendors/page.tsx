@@ -10,6 +10,7 @@ import { getAllVendors, searchVendors } from './actions';
 import { useState, useEffect } from 'react';
 import useDebounce from '@/hooks/useDebounce';
 import { VendorCard } from '@/components/vendor-card';
+import Link from 'next/link';
 
 interface Vendor {
   id: string;
@@ -107,10 +108,12 @@ export default function Vendors() {
           <h1 className="text-2xl font-bold mb-2">Vendors</h1>
           <p className="text-gray-500">Find and search through all available vendors</p>
         </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Add Vendor
-        </Button>
+        <Link href="/vendors/new">
+          <Button className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Vendor
+          </Button>
+        </Link>
       </div>
 
       <div className='mb-8'>
