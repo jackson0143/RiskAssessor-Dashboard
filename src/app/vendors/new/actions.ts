@@ -37,7 +37,7 @@ export async function addVendor(vendorData: {
       },
     });
    
-    revalidatePath('/addVendor');
+    revalidatePath('/vendors/new');
 
     return { success: true, vendor };
   } catch (error) {
@@ -53,7 +53,7 @@ export async function deleteVendor(vendorId: string) {
         id: vendorId,
       },
     });
-    revalidatePath('/addVendor');
+    revalidatePath('/vendors/new');
 
     return { success: true };
   } catch (error) {
@@ -96,7 +96,7 @@ export async function updateVendor(vendorId: string, vendorData: {
       data: vendorData,
     });
 
-    revalidatePath('/addVendor');
+    revalidatePath('/vendors/new');
     revalidatePath(`/vendors/${vendorId}`);
 
     return { success: true, vendor };
