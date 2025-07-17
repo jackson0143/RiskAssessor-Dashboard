@@ -1,16 +1,28 @@
-'use client';
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+"use client";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 // import { ChevronDown } from "lucide-react"
-import { Plus } from "lucide-react"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getAllVendors, searchVendors } from './actions';
-import { useState, useEffect } from 'react';
-import useDebounce from '@/hooks/useDebounce';
-import { VendorCard } from '@/components/vendor-card';
-import Link from 'next/link';
+import { Plus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getAllVendors, searchVendors } from "./actions";
+import { useState, useEffect } from "react";
+import useDebounce from "@/hooks/useDebounce";
+import { VendorCard } from "@/components/vendor-card";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Filter } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Search } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Vendor {
   id: string;
@@ -30,7 +42,7 @@ export default function Vendors() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 5,
@@ -100,13 +112,26 @@ export default function Vendors() {
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   };
 
+
+
+  const [riskFilter, setRiskFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [assessmentFilter, setAssessmentFilter] = useState('all');
+  const [ownerFilter, setOwnerFilter] = useState('all');
+
+  const uniqueCategories = [...new Set(vendors.map(vendor => vendor.industry).filter(Boolean))];
+ 
+
   return (
     <div className="p-4">
       {/* Header */}
       <div className="mb-6 flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-bold mb-2">Vendors</h1>
-          <p className="text-gray-500">Find and search through all available vendors</p>
+          <p className="text-gray-500">
+            Find and search through all available vendors
+          </p>
         </div>
         <Link href="/vendors/new">
           <Button className="flex items-center gap-2">
@@ -116,66 +141,127 @@ export default function Vendors() {
         </Link>
       </div>
 
-      <div className='mb-8'>
+
         {/* Search Input */}
-        <div className="mb-4">
-          <Input
-            type="text"
-            placeholder="Search vendors by name, email, or other criteria..."
-            className="w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <Card>
+          <CardContent className="">
+            <div className="space-y-2">
+              <Label htmlFor="search">Search Vendors</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="search"
+                  placeholder="Search by vendor name, category, contact, owner, or department..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 text-base bg-[#f3f3f5]"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Filters (implement later)*/}
-        <div className="flex flex-wrap gap-4">
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                All Categories
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>All Categories</DropdownMenuItem>
-              <DropdownMenuItem>Supplier</DropdownMenuItem>
-              <DropdownMenuItem>Contractor</DropdownMenuItem>
-              <DropdownMenuItem>Service Provider</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <Card className="mt-4">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Filter className="h-5 w-5" />
+            <span>Filters</span>
+          </CardTitle>
+          <CardDescription>
+            Apply filters to narrow down your search results
+          </CardDescription>
+        </CardHeader>
+          <CardContent>
+                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="space-y-2">
+          <Label htmlFor="riskFilter">Risk Level</Label>
+                     <Select value={riskFilter} onValueChange={setRiskFilter}>
+                 <SelectTrigger className="w-full bg-[#f3f3f5]">
+                   <SelectValue placeholder="All risk levels" />
+                 </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Risk Levels</SelectItem>
+                  <SelectItem value="High">High</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="Low">Low</SelectItem>
+                </SelectContent>
+              </Select>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                All Status
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>All Status</DropdownMenuItem>
-              <DropdownMenuItem>Active</DropdownMenuItem>
-              <DropdownMenuItem>Inactive</DropdownMenuItem>
-              <DropdownMenuItem>Pending</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu> */}
 
-          {/* <Button>
-            Search
-          </Button> */}
+              </div>
 
-          <Button variant = "outline"className="rounded-sm " onClick={clearFilter}>
-            Clear Filters
-          </Button>
-        </div>
-      </div>
 
-      {/* Results Section */}
+              <div className="space-y-2">
+              <Label htmlFor="statusFilter">Status</Label>
+                             <Select value={statusFilter} onValueChange={setStatusFilter}>
+                 <SelectTrigger className="w-full bg-[#f3f3f5]">
+                   <SelectValue placeholder="All statuses" />
+                 </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                  <SelectItem value="Under Review">Under Review</SelectItem>
+                  <SelectItem value="Pending Assessment">Pending Assessment</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="assessmentFilter">Assessment</Label>
+                             <Select value={assessmentFilter} onValueChange={setAssessmentFilter}>
+                 <SelectTrigger className="w-full bg-[#f3f3f5]">
+                   <SelectValue placeholder="All assessments" />
+                 </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Assessments</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="categoryFilter">Category</Label>
+                             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                 <SelectTrigger className="w-full bg-[#f3f3f5]">
+                   <SelectValue placeholder="All categories" />
+                 </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {uniqueCategories.map(category => (
+                    <SelectItem key={category} value={category || ''}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            </div>
+            {/* <div className="space-y-2">
+              <Label htmlFor="ownerFilter">Owner Department</Label>
+              <Select value={ownerFilter} onValueChange={setOwnerFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All departments" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Departments</SelectItem>
+                  {uniqueDepartments.map(department => (
+                    <SelectItem key={department} value={department}>
+                      {department}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div> */}
+          </CardContent>
+        </Card>
+
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Search Results</h2>
           <span className="text-gray-500">
-            {loading ? 'Loading...' : `Showing ${currentVendors.length} of ${vendors.length} results`}
+            {loading
+              ? "Loading..."
+              : `Showing ${currentVendors.length} of ${vendors.length} results`}
           </span>
         </div>
 
@@ -193,7 +279,10 @@ export default function Vendors() {
         {loading && (
           <div className="space-y-4">
             {Array.from({ length: 3 }, (_, index) => (
-            <div key={index} className="bg-slate-50/80 dark:bg-neutral-900 rounded-lg border p-6">
+              <div
+                key={index}
+                className="bg-slate-50/80 dark:bg-neutral-900 rounded-lg border p-6"
+              >
                 <div className="flex flex-row items-start justify-between space-y-0 pb-2">
                   <div className="space-y-3 flex-1">
                     <Skeleton className="h-6 w-48" />
@@ -235,13 +324,22 @@ export default function Vendors() {
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => handlePageChange(pagination.pageIndex - 1)}
-                        className={pagination.pageIndex === 0 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      <PaginationPrevious
+                        onClick={() =>
+                          handlePageChange(pagination.pageIndex - 1)
+                        }
+                        className={
+                          pagination.pageIndex === 0
+                            ? "pointer-events-none opacity-50"
+                            : "cursor-pointer"
+                        }
                       />
                     </PaginationItem>
-                    
-                    {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+
+                    {Array.from(
+                      { length: totalPages },
+                      (_, index) => index + 1
+                    ).map((page) => (
                       <PaginationItem key={page}>
                         <PaginationLink
                           onClick={() => handlePageChange(page - 1)}
@@ -252,11 +350,17 @@ export default function Vendors() {
                         </PaginationLink>
                       </PaginationItem>
                     ))}
-                    
+
                     <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => handlePageChange(pagination.pageIndex + 1)}
-                        className={pagination.pageIndex === totalPages - 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      <PaginationNext
+                        onClick={() =>
+                          handlePageChange(pagination.pageIndex + 1)
+                        }
+                        className={
+                          pagination.pageIndex === totalPages - 1
+                            ? "pointer-events-none opacity-50"
+                            : "cursor-pointer"
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>
