@@ -16,13 +16,34 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getAllVendors, searchVendors } from "./actions";
 import { useState, useEffect } from "react";
 import useDebounce from "@/hooks/useDebounce";
-import { VendorCard } from "@/components/vendor-card";
+import { VendorTableRow } from "@/components/vendor-table-row";
+
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Filter } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Search } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface Vendor {
   id: string;
@@ -50,7 +71,7 @@ export default function Vendors() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   useEffect(() => {
-    if (debouncedSearchTerm.trim() === '') {
+    if (debouncedSearchTerm.trim() === "") {
       loadAllVendors();
     } else {
       handleSearch(debouncedSearchTerm);
@@ -58,7 +79,7 @@ export default function Vendors() {
   }, [debouncedSearchTerm]);
 
   //Load all vendors on mount, and when search is cleared
-  //check if we can make this a server sided component later 
+  //check if we can make this a server sided component later
   const loadAllVendors = async () => {
     setLoading(true);
     setError(null);
@@ -109,6 +130,9 @@ export default function Vendors() {
 
   const clearFilter = () => {
     setSearchTerm('');
+    setRiskFilter('all');
+    setStatusFilter('all');
+    setCategoryFilter('all');
     setPagination(prev => ({ ...prev, pageIndex: 0 }));
   };
 
@@ -117,11 +141,11 @@ export default function Vendors() {
   const [riskFilter, setRiskFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [assessmentFilter, setAssessmentFilter] = useState('all');
-  const [ownerFilter, setOwnerFilter] = useState('all');
 
-  const uniqueCategories = [...new Set(vendors.map(vendor => vendor.industry).filter(Boolean))];
- 
+  //Change this to use the unique categories from the db, and also make the search debounce dynamic from db too
+  const uniqueCategories = [
+    ...new Set(vendors.map((vendor) => vendor.industry).filter(Boolean)),
+  ];
 
   return (
     <div className="p-4">
@@ -141,44 +165,59 @@ export default function Vendors() {
         </Link>
       </div>
 
-
-        {/* Search Input */}
-        <Card>
-          <CardContent className="">
-            <div className="space-y-2">
-              <Label htmlFor="search">Search Vendors</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="search"
-                  placeholder="Search by vendor name, category, contact, owner, or department..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 text-base bg-[#f3f3f5]"
-                />
-              </div>
+      {/* Search Input */}
+      <Card>
+        <CardContent className="">
+          <div className="space-y-2">
+            <Label htmlFor="search">Search Vendors</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="search"
+                placeholder="Search by vendor name, category, contact, owner, or department..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 text-base bg-[#f3f3f5]"
+              />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card className="mt-4">
+      <Card className="mt-4">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Filter className="h-5 w-5" />
-            <span>Filters</span>
-          </CardTitle>
-          <CardDescription>
-            Apply filters to narrow down your search results
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center space-x-2">
+                <Filter className="h-5 w-5" />
+                <span>Filters</span>
+              </CardTitle>
+              <CardDescription>
+                Apply filters to narrow down your search results
+              </CardDescription>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={clearFilter}
+              className="flex items-center gap-2"
+            >
+             
+              Clear Filters
+            </Button>
+          </div>
         </CardHeader>
-          <CardContent>
-                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <CardContent>
+
+
+
+          {/* Filter 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             <div className="space-y-2">
-          <Label htmlFor="riskFilter">Risk Level</Label>
-                     <Select value={riskFilter} onValueChange={setRiskFilter}>
-                 <SelectTrigger className="w-full bg-[#f3f3f5]">
-                   <SelectValue placeholder="All risk levels" />
-                 </SelectTrigger>
+              <Label htmlFor="riskFilter">Risk Level</Label>
+              <Select value={riskFilter} onValueChange={setRiskFilter}>
+                <SelectTrigger className="w-full bg-[#f3f3f5]">
+                  <SelectValue placeholder="All risk levels" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Risk Levels</SelectItem>
                   <SelectItem value="High">High</SelectItem>
@@ -186,85 +225,64 @@ export default function Vendors() {
                   <SelectItem value="Low">Low</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
 
-
-              </div>
-
-
-              <div className="space-y-2">
+            {/* Filter 2 */}
+            <div className="space-y-2">
               <Label htmlFor="statusFilter">Status</Label>
-                             <Select value={statusFilter} onValueChange={setStatusFilter}>
-                 <SelectTrigger className="w-full bg-[#f3f3f5]">
-                   <SelectValue placeholder="All statuses" />
-                 </SelectTrigger>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full bg-[#f3f3f5]">
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Inactive">Inactive</SelectItem>
                   <SelectItem value="Under Review">Under Review</SelectItem>
-                  <SelectItem value="Pending Assessment">Pending Assessment</SelectItem>
+                
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="assessmentFilter">Assessment</Label>
-                             <Select value={assessmentFilter} onValueChange={setAssessmentFilter}>
-                 <SelectTrigger className="w-full bg-[#f3f3f5]">
-                   <SelectValue placeholder="All assessments" />
-                 </SelectTrigger>
+              <Select
+                value={assessmentFilter}
+                onValueChange={setAssessmentFilter}
+              >
+                <SelectTrigger className="w-full bg-[#f3f3f5]">
+                  <SelectValue placeholder="All assessments" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Assessments</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
+
+            {/* Filter 3 */}
             <div className="space-y-2">
               <Label htmlFor="categoryFilter">Category</Label>
-                             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                 <SelectTrigger className="w-full bg-[#f3f3f5]">
-                   <SelectValue placeholder="All categories" />
-                 </SelectTrigger>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-full bg-[#f3f3f5]">
+                  <SelectValue placeholder="All categories" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {uniqueCategories.map(category => (
-                    <SelectItem key={category} value={category || ''}>
+                  {uniqueCategories.map((category) => (
+                    <SelectItem key={category} value={category || ""}>
                       {category}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            </div>
-            {/* <div className="space-y-2">
-              <Label htmlFor="ownerFilter">Owner Department</Label>
-              <Select value={ownerFilter} onValueChange={setOwnerFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All departments" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  {uniqueDepartments.map(department => (
-                    <SelectItem key={department} value={department}>
-                      {department}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div> */}
-          </CardContent>
-        </Card>
+          </div>
+         
+        </CardContent>
+      </Card>
 
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Search Results</h2>
-          <span className="text-gray-500">
-            {loading
-              ? "Loading..."
-              : `Showing ${currentVendors.length} of ${vendors.length} results`}
-          </span>
-        </div>
-
         {/* Error state*/}
         {error && (
           <div className="text-center py-8 text-red-500">
@@ -275,48 +293,116 @@ export default function Vendors() {
           </div>
         )}
 
-        {/* Loading state*/}
+        {/* Loading state SKELETON*/}
         {loading && (
-          <div className="space-y-4">
-            {Array.from({ length: 3 }, (_, index) => (
-              <div
-                key={index}
-                className="bg-slate-50/80 dark:bg-neutral-900 rounded-lg border p-6"
-              >
-                <div className="flex flex-row items-start justify-between space-y-0 pb-2">
-                  <div className="space-y-3 flex-1">
-                    <Skeleton className="h-6 w-48" />
-                    <Skeleton className="h-4 w-64" />
-                    <Skeleton className="h-3 w-32" />
-                    <div className="flex gap-4 mt-2">
-                      <Skeleton className="h-6 w-20" />
-                      <Skeleton className="h-6 w-32" />
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Skeleton className="h-9 w-16" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle>Vendors</CardTitle>
+              <CardDescription>Loading vendors...</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Vendor</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Risk Level</TableHead>
+                    <TableHead>Status</TableHead>
+                    {/* <TableHead>Assessment</TableHead> */}
+                    <TableHead>Owner</TableHead>
+                    <TableHead>Primary Contact</TableHead>
+                    <TableHead>Details</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Array.from({ length: 3 }, (_, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-40" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-16" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-16" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Skeleton className="h-4 w-4 rounded-full" />
+                          <Skeleton className="h-4 w-16" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <Skeleton className="h-3 w-20" />
+                          <Skeleton className="h-3 w-24" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <Skeleton className="h-3 w-24" />
+                          <Skeleton className="h-3 w-32" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-8 w-24" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         )}
 
         {/* List all the results, given that there are no errors or loading*/}
         {!loading && !error && (
           <>
-            <div className="space-y-4">
-              {currentVendors.length > 0 ? (
-                currentVendors.map((vendor) => (
-                  <VendorCard key={vendor.id} vendor={vendor} />
-                ))
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <p className="text-lg mb-2">No vendors found</p>
-                  <p>There are no vendors in the system</p>
-                </div>
-              )}
-            </div>
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle>Vendors ({currentVendors.length} found)</CardTitle>
+                <CardDescription>
+                  {currentVendors.length === vendors.length
+                    ? "All vendors are displayed"
+                    : `Showing ${currentVendors.length} of ${vendors.length} vendors`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {currentVendors.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">
+                      No vendors found matching your criteria
+                    </p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Vendor</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Risk Level</TableHead>
+                        <TableHead>Status</TableHead>
+                        {/* <TableHead>Assessment</TableHead> */}
+                        <TableHead>Owner</TableHead>
+                        <TableHead>Primary Contact</TableHead>
+                        <TableHead>Details</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {currentVendors.map((vendor) => (
+                        <VendorTableRow key={vendor.id} vendor={vendor} />
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Pagination */}
             {totalPages > 1 && (
