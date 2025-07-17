@@ -24,7 +24,7 @@ export function VendorCard({ vendor }: VendorCardProps) {
   };
 
   return (
-    <Card className="hover:shadow-md">
+    <Card className="shadow-none rounded-md">
       <CardHeader className="flex items-start justify-between">
         <div>
           <CardTitle className="text-lg">{vendor.name}</CardTitle>

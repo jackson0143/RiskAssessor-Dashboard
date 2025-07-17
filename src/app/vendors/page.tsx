@@ -160,11 +160,11 @@ export default function Vendors() {
             </DropdownMenuContent>
           </DropdownMenu> */}
 
-          <Button>
+          {/* <Button>
             Search
-          </Button>
+          </Button> */}
 
-          <Button variant="outline" onClick={clearFilter}>
+          <Button variant = "outline"className="rounded-sm " onClick={clearFilter}>
             Clear Filters
           </Button>
         </div>
