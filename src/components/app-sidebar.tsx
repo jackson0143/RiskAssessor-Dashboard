@@ -1,4 +1,4 @@
-import { Home, HousePlus, Users, MoreHorizontal } from "lucide-react";
+import { Home, HousePlus, Users} from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { ModeToggle } from "@/components/mode-toggle";
@@ -12,16 +12,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
-  SidebarMenuAction,
+
   SidebarHeader,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 
 const items = [
   {
@@ -108,20 +103,7 @@ export function AppSidebar() {
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuAction>
-                        <MoreHorizontal />
-                      </SidebarMenuAction>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="right" align="start">
-                      <DropdownMenuItem asChild>
-                        <a href="/questions/addquestion">
-                          <span>Add Question</span>
-                        </a>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
