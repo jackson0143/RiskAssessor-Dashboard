@@ -153,7 +153,7 @@ export default function Vendors() {
       <div className="mb-6 flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-bold mb-2">Vendors</h1>
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-sm">
             Find and search through all available vendors
           </p>
         </div>
@@ -366,11 +366,13 @@ export default function Vendors() {
           <>
             <Card className="mt-4">
               <CardHeader>
-                <CardTitle>Vendors ({currentVendors.length} found)</CardTitle>
+                <CardTitle>Vendors</CardTitle>
                 <CardDescription>
+
+                  {/*fix this in the future*/}
                   {currentVendors.length === vendors.length
-                    ? "All vendors are displayed"
-                    : `Showing ${currentVendors.length} of ${vendors.length} vendors`}
+                    ? `Showing ${currentVendors.length} of ${vendors.length} vendors`
+                    : "N/A"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
