@@ -11,10 +11,22 @@ export async function searchVendors(searchTerm: string) {
       where: {
         OR: [
           { name: { contains: searchTerm, mode: 'insensitive' } },
-          { email: { contains: searchTerm, mode: 'insensitive' } },
-          { phone_no: { contains: searchTerm, mode: 'insensitive' } },
+          { ownerName: { contains: searchTerm, mode: 'insensitive' } },
+          {
+            contacts: {
+              some: {
+                OR: [
+                  { name: { contains: searchTerm, mode: 'insensitive' } },
+                  { email: { contains: searchTerm, mode: 'insensitive' } },
+                ]
+              }
+            }
+          }
         ],
-      },    
+      },
+      include: {
+        contacts: true,
+      },
       take: 20
     });
     return { success: true, vendors };
@@ -26,8 +38,12 @@ export async function searchVendors(searchTerm: string) {
 
 export async function getAllVendors() {
   try {
-    const vendors = await prisma.vendor.findMany();
-    revalidatePath('/search');
+    const vendors = await prisma.vendor.findMany({
+      include: {
+        contacts: true,
+      },
+    });
+    revalidatePath('/vendors');
   
     return { success: true, vendors };
   } catch (error) {
@@ -43,6 +59,7 @@ export async function getVendorById(vendorId: string) {
         id: vendorId,
       },
       include: {
+        contacts: true,
         reviews: true,
       },
     });

@@ -45,15 +45,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface Vendor {
+interface Contact {
   id: string;
   name: string;
   email: string;
-  address: string;
-  phone_no: string;
-  industry: string | null;
+  phone: string | null;
+  role: string | null;
+  department: string | null;
+  type: 'PRIMARY' | 'SECONDARY';
+}
+
+interface Vendor {
+  id: string;
+  name: string;
+  ownerName: string | null;
+  status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
   website: string | null;
+  securityMaturity: string | null;
+  impact: string | null;
   riskScore: number;
+  category: string | null;
+  description: string | null;
+  contacts: Contact[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -144,7 +157,7 @@ export default function Vendors() {
 
   //Change this to use the unique categories from the db, and also make the search debounce dynamic from db too
   const uniqueCategories = [
-    ...new Set(vendors.map((vendor) => vendor.industry).filter(Boolean)),
+    ...new Set(vendors.map((vendor) => vendor.category).filter(Boolean)),
   ];
 
   return (
@@ -236,10 +249,9 @@ export default function Vendors() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                  <SelectItem value="Under Review">Under Review</SelectItem>
-                
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="INACTIVE">Inactive</SelectItem>
+                  <SelectItem value="PENDING">Pending</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -305,11 +317,9 @@ export default function Vendors() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Vendor</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Risk Level</TableHead>
-                    <TableHead>Status</TableHead>
-                    {/* <TableHead>Assessment</TableHead> */}
                     <TableHead>Owner</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Risk Level</TableHead>
                     <TableHead>Primary Contact</TableHead>
                     <TableHead>Details</TableHead>
                   </TableRow>
@@ -324,13 +334,10 @@ export default function Vendors() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Skeleton className="h-6 w-20" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-6 w-16" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-6 w-16" />
+                        <div className="space-y-1">
+                          <Skeleton className="h-3 w-20" />
+                          <Skeleton className="h-3 w-24" />
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
@@ -339,10 +346,7 @@ export default function Vendors() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="space-y-1">
-                          <Skeleton className="h-3 w-20" />
-                          <Skeleton className="h-3 w-24" />
-                        </div>
+                        <Skeleton className="h-6 w-16" />
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
@@ -384,18 +388,16 @@ export default function Vendors() {
                   </div>
                 ) : (
                   <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Vendor</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Risk Level</TableHead>
-                        <TableHead>Status</TableHead>
-                        {/* <TableHead>Assessment</TableHead> */}
-                        <TableHead>Owner</TableHead>
-                        <TableHead>Primary Contact</TableHead>
-                        <TableHead>Details</TableHead>
-                      </TableRow>
-                    </TableHeader>
+                                    <TableHeader>
+                  <TableRow>
+                    <TableHead>Vendor</TableHead>
+                    <TableHead>Owner</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Risk Level</TableHead>
+                    <TableHead>Primary Contact</TableHead>
+                    <TableHead>Details</TableHead>
+                  </TableRow>
+                </TableHeader>
                     <TableBody>
                       {currentVendors.map((vendor) => (
                         <VendorTableRow key={vendor.id} vendor={vendor} />

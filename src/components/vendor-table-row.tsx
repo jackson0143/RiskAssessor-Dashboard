@@ -1,20 +1,32 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { AlertTriangle,Check,X, Eye } from "lucide-react"
+import { AlertTriangle, Check, X, Eye } from "lucide-react"
 import Link from "next/link"
+
+interface Contact {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  role: string | null;
+  department: string | null;
+  type: 'PRIMARY' | 'SECONDARY';
+}
 
 interface VendorTableRowProps {
   vendor: {
     id: string;
     name: string;
-    email: string;
-    address: string;
-    phone_no: string;
-    industry: string | null;
+    ownerName: string | null;
+    status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
     website: string | null;
+    securityMaturity: string | null;
+    impact: string | null;
     riskScore: number;
-    status?: 'Active' | 'Inactive' | 'Pending';
+    category: string | null;
+    description: string | null;
+    contacts: Contact[];
   };
 }
 
@@ -31,15 +43,15 @@ export function VendorTableRow({ vendor }: VendorTableRowProps) {
     return 'default';
   };
 
-  const getStatusVariant = (status?: 'Active' | 'Inactive' | 'Pending') => {
+  const getStatusVariant = (status: 'ACTIVE' | 'INACTIVE' | 'PENDING') => {
     switch (status) {
-      case 'Active':
+      case 'ACTIVE':
         return {
           icon: <Check className="h-4 w-4 text-green-500" />,
           text: 'Active',
           className: 'text-green-600 font-medium'
         };
-      case 'Inactive':
+      case 'INACTIVE':
         return {
           icon: <X className="h-4 w-4 text-red-500" />,
           text: 'Inactive',
@@ -54,36 +66,32 @@ export function VendorTableRow({ vendor }: VendorTableRowProps) {
     }
   };
 
+  // Get primary contact
+  const primaryContact = vendor.contacts.find(contact => contact.type === 'PRIMARY');
+
   return (
     <TableRow>
-      {/* Vendor Name*/}
+      {/* Vendor Name */}
       <TableCell>
         <div>
           <div className="font-medium">{vendor.name}</div>
           <div className="text-sm text-muted-foreground">
-            {vendor.email}
+            {vendor.website || "No website"}
           </div>
         </div>
       </TableCell>
 
-      {/* Vendor Industry*/}
+      {/* Owner */}
       <TableCell>
-        <Badge variant="secondary">
-          {vendor.industry || "N/A"}
-        </Badge>
+        <div>
+          <div className="text-sm">{vendor.ownerName || "N/A"}</div>
+          <div className="text-xs text-muted-foreground">
+            {vendor.category || "No category"}
+          </div>
+        </div>
       </TableCell>
 
-      {/* Vendor Risk Level (from the score)*/}
-      <TableCell>
-        <Badge
-          variant={getRiskBadgeVariant(vendor.riskScore)}
-        >
-          {getRiskLevel(vendor.riskScore)}
-        </Badge>
-      </TableCell>
-
-
-      {/* Vendor Status*/}
+      {/* Status */}
       <TableCell>
         <div className="flex items-center space-x-1">
           {(() => {
@@ -100,22 +108,19 @@ export function VendorTableRow({ vendor }: VendorTableRowProps) {
         </div>
       </TableCell>
 
-      {/* Vendor Owner*/}
+      {/* Risk Level */}
       <TableCell>
-        <div>
-          <div className="text-sm">John Doe</div>
-          <div className="text-xs text-muted-foreground">
-            IT Department
-          </div>
-        </div>
+        <Badge variant={getRiskBadgeVariant(vendor.riskScore)}>
+          {getRiskLevel(vendor.riskScore)}
+        </Badge>
       </TableCell>
 
       {/*Primary contact*/}
       <TableCell>
         <div>
-          <div className="text-sm">{vendor.name}</div>
+          <div className="text-sm">{primaryContact?.name || "N/A"}</div>
           <div className="text-xs text-muted-foreground">
-            {vendor.email}
+            {primaryContact?.email || "No email"}
           </div>
         </div>
       </TableCell>

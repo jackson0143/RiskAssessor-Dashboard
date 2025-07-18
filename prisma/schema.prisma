@@ -32,26 +32,58 @@ enum QuestionType {
   BOOLEAN
 }
 
+enum ContactType {
+  PRIMARY
+  SECONDARY
+}
 
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
 
+model Contact {
+  id        String      @id @default(uuid()) @db.Uuid
+  name      String
+  email     String
+  phone     String?
+  role      String?
+  department String?
+  type      ContactType
+  
+  // Relations
+  vendorId  String      @db.Uuid
+  vendor    Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([vendorId, type]) // This should make it so that there can only be one primary and one secondary contact per vendor
+}
 
 model Vendor {
   id        String   @id @default(uuid()) @db.Uuid
   name      String
-  email     String   @unique
-  address   String
-  phone_no  String
-  industry  String?
+  ownerName     String?
+  status VendorStatus @default(PENDING)
+
   website   String?
+  securityMaturity String?
+  impact String?
   riskScore Int      @default(0)
-  //Add certifications here 
+  category String?
+  description String?
+
+
+  
+  // Relations
+  contacts      Contact[]
+  reviews       VendorReview[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  reviews   VendorReview[]
 }
-
-
 
 model VendorReview {
   id              String      @id @default(uuid()) @db.Uuid
@@ -69,6 +101,7 @@ model VendorReview {
 
   answers         Answer[]
 }
+
 model Question {
   id           String       @id @default(uuid()) @db.Uuid
   questionText String
@@ -79,13 +112,10 @@ model Question {
   options      String[]     // For multiple choice questions, if not then just pass in []
   isActive     Boolean      @default(true)  // To softdelete in case in the future we want to look back at old questions
 
-
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   answers      Answer[]
 }
-
-
 
 model Answer {
   id         String   @id @default(uuid()) @db.Uuid

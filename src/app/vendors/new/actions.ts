@@ -5,10 +5,13 @@ import { revalidatePath } from 'next/cache';
 
 const prisma = new PrismaClient();
 
-
 export async function getAllVendors() {
   try {
-    const vendors = await prisma.vendor.findMany();
+    const vendors = await prisma.vendor.findMany({
+      include: {
+        contacts: true,
+      },
+    });
     
     return { success: true, vendors };
   } catch (error) {
@@ -16,28 +19,87 @@ export async function getAllVendors() {
     return { success: false, error: 'Failed to fetch vendors' };
   }
 }
+
 export async function addVendor(vendorData: {
   name: string;
-  email: string;
-  address: string;
-  phone_no: string;
-  industry?: string;
+  ownerName?: string;
   website?: string;
+  securityMaturity?: string;
+  impact?: string;
+  category?: string;
+  description?: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
+  primaryContact: {
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
+    department: string;
+  };
+  secondaryContact: {
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
+    department: string;
+  };
 }) {
   try {
     const vendor = await prisma.vendor.create({
       data: {
         name: vendorData.name,
-        email: vendorData.email,
-        address: vendorData.address,
-        phone_no: vendorData.phone_no,
-        industry: vendorData.industry || null,
+        ownerName: vendorData.ownerName || null,
         website: vendorData.website || null,
+        securityMaturity: vendorData.securityMaturity || null,
+        impact: vendorData.impact || null,
+        category: vendorData.category || null,
+        description: vendorData.description || null,
+        status: vendorData.status,
         riskScore: 0, // Default value
+        contacts: {
+          create: (() => {
+            const contacts: Array<{
+              name: string;
+              email: string;
+              phone: string | null;
+              role: string | null;
+              department: string | null;
+              type: 'PRIMARY' | 'SECONDARY';
+            }> = [
+              // Primary contact
+              {
+                name: vendorData.primaryContact.name,
+                email: vendorData.primaryContact.email,
+                phone: vendorData.primaryContact.phone || null,
+                role: vendorData.primaryContact.role || null,
+                department: vendorData.primaryContact.department || null,
+                type: 'PRIMARY',
+              }
+            ];
+            
+            // Add secondary contact if name is provided
+            if (vendorData.secondaryContact.name) {
+              contacts.push({
+                name: vendorData.secondaryContact.name,
+                email: vendorData.secondaryContact.email,
+                phone: vendorData.secondaryContact.phone || null,
+                role: vendorData.secondaryContact.role || null,
+                department: vendorData.secondaryContact.department || null,
+                type: 'SECONDARY',
+              });
+            }
+            
+            return contacts;
+          })(),
+        },
+      },
+      include: {
+        contacts: true,
       },
     });
    
     revalidatePath('/vendors/new');
+    revalidatePath('/vendors');
 
     return { success: true, vendor };
   } catch (error) {
@@ -54,6 +116,7 @@ export async function deleteVendor(vendorId: string) {
       },
     });
     revalidatePath('/vendors/new');
+    revalidatePath('/vendors');
 
     return { success: true };
   } catch (error) {
@@ -69,6 +132,7 @@ export async function getVendorById(vendorId: string) {
         id: vendorId,
       },
       include: {
+        contacts: true,
         reviews: true,
       },
     });
@@ -81,11 +145,13 @@ export async function getVendorById(vendorId: string) {
 
 export async function updateVendor(vendorId: string, vendorData: {
   name?: string;
-  email?: string;
-  address?: string;
-  phone_no?: string;
-  industry?: string;
+  ownerName?: string;
   website?: string;
+  securityMaturity?: string;
+  impact?: string;
+  category?: string;
+  description?: string;
+  status?: 'ACTIVE' | 'INACTIVE' | 'PENDING';
   riskScore?: number;
 }) {
   try {
@@ -94,10 +160,14 @@ export async function updateVendor(vendorId: string, vendorData: {
         id: vendorId,
       },
       data: vendorData,
+      include: {
+        contacts: true,
+      },
     });
 
     revalidatePath('/vendors/new');
     revalidatePath(`/vendors/${vendorId}`);
+    revalidatePath('/vendors');
 
     return { success: true, vendor };
   } catch (error) {
