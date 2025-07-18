@@ -69,7 +69,7 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <Link href="/vendors">
+          <Link href="/admin/vendors">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Vendors
