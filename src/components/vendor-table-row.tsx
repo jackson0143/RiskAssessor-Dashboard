@@ -125,7 +125,7 @@ export function VendorTableRow({ vendor }: VendorTableRowProps) {
         </div>
       </TableCell>
       <TableCell>
-        <Link href={`/vendors/${vendor.id}`}>
+        <Link href={`/admin/vendors/${vendor.id}`}>
           <Button variant="outline" size="sm">
             <Eye className="h-4 w-4 mr-1" />
             View Details

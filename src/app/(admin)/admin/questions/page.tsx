@@ -57,7 +57,7 @@ export default async function QuestionsPage() {
             Manage risk assessment questions and questionnaires
           </p>
         </div>
-        <Link href="/questions/new">
+        <Link href="/admin/questions/new">
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Add Question

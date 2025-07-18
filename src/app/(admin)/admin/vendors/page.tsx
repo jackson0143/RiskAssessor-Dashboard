@@ -170,7 +170,7 @@ export default function Vendors() {
             Find and search through all available vendors
           </p>
         </div>
-        <Link href="/vendors/new">
+        <Link href="/admin/vendors/new">
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Add Vendor

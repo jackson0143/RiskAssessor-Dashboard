@@ -1,7 +1,11 @@
 import { Home, HousePlus, Users} from "lucide-react";
 import { usePathname } from "next/navigation";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { User2 } from "lucide-react";
+import { ChevronUp } from "lucide-react";
+import { useClerk, useUser } from "@clerk/nextjs";
 
-import { ModeToggle } from "@/components/mode-toggle";
+// import { ModeToggle } from "@/components/mode-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +16,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
-
   SidebarHeader,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
@@ -41,7 +44,9 @@ const items2 = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  
+  const { signOut } = useClerk();
+  const { user } = useUser();
+
   return (
     <Sidebar collapsible="offcanvas" className="h-auto">
       <SidebarHeader>
@@ -112,8 +117,31 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        <ModeToggle />
-      </SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu >
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton>
+                    <User2 /> {user?.firstName || "User"}
+                    <ChevronUp className="ml-auto" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  className="w-[--radix-popper-anchor-width]"
+                >
+                  <DropdownMenuItem onClick={() => window.location.href = "/admin/settings"}>
+                    <span>Account</span>
+                  </DropdownMenuItem>
+                 
+                                      <DropdownMenuItem onClick={() => signOut({redirectUrl: "/sign-in"})}>
+                      <span>Sign out</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
     </Sidebar>
   );
 }
