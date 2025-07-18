@@ -1,21 +1,44 @@
-"use client"
+import { type Metadata } from 'next'
+import {
+  ClerkProvider,
+  SignedIn,
+  UserButton,
+} from '@clerk/nextjs'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
 
-import { ThemeProvider } from "@/components/theme-provider"
-import "./globals.css"
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+})
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
+
+export const metadata: Metadata = {
+  title: 'Allnex Risk Assessor',
+  description: 'Vendor risk assessment and management platform',
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-        >
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <SignedIn>
+            <header className="flex justify-end items-center p-4 gap-4 h-16">
+              <UserButton />
+            </header>
+          </SignedIn>
           {children}
-        </ThemeProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
