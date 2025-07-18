@@ -11,11 +11,12 @@ function MobileSidebarTrigger() {
   if (!isMobile) {
     return null
   }
-  
+ 
   return <SidebarTrigger />
 }
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+
   return (
     <SidebarProvider>
       <AppSidebar />

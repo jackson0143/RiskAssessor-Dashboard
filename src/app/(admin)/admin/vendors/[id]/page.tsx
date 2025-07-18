@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Edit, Mail, Phone, AlertTriangle, User, Building } from "lucide-react"
 import Link from "next/link"
-import { getVendorById } from "../../vendors/actions"
+import { getVendorById } from "../actions"
 import { SectionCards } from "@/components/section-cards"
 import { ChartBarMixed } from "@/components/bar-chart"
 

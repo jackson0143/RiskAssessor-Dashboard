@@ -21,12 +21,12 @@ import {
 const items = [
   {
     title: "Home",
-    url: "/home",
+    url: "/admin/home",
     icon: Home,
   },
   {
     title: "Vendors",
-    url: "/vendors",
+    url: "/admin/vendors",
     icon: Users,
   },
 ];
@@ -34,7 +34,7 @@ const items = [
 const items2 = [
   {
     title: "Questions",
-    url: "/questions",
+    url: "/admin/questions",
     icon: HousePlus,
   },
 ];
