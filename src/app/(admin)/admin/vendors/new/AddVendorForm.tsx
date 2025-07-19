@@ -25,7 +25,7 @@ export default function AddVendorForm() {
     impact: '',
     category: '',
     description: '',
-    status: 'PENDING' as 'ACTIVE' | 'INACTIVE' | 'PENDING',
+    status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE' | 'PENDING',
     primaryContact: {
       name: '',
       email: '',
