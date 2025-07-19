@@ -69,3 +69,41 @@ export async function getVendorById(vendorId: string) {
     return { success: false, error: 'Failed to fetch vendor' };
   }
 }
+
+export async function getVendorReview(newvendorId: string) {
+  try {
+    const vendorReviews = await prisma.vendorReview.findMany({
+      where: {
+        vendorId: newvendorId,
+      },
+      include: {
+        vendor: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    
+
+ 
+    return { vendorReviews };
+  } catch (error) {
+    console.error('Error fetching vendor reviews:', error);
+    return { vendorReviews: [] };
+  }
+}
+
+
+export async function getUniqueCategories() {
+  try {
+    const categories = await prisma.vendor.findMany({
+      select: {
+        category: true,
+      },
+    });
+    return { success: true, categories };
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return { success: false, error: 'Failed to fetch categories' };
+  }
+}

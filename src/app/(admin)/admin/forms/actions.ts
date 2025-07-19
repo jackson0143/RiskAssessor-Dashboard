@@ -7,11 +7,40 @@ import { uploadISO27001Certificate } from "@/lib/upload-helpers";
 
 const prisma = new PrismaClient();
 
+export async function filterCompanyNames(searchTerm: string) {
+  try {
+    if (!searchTerm || searchTerm.trim().length < 2) {
+      return { success: true, companies: [] };
+    }
+
+    const companies = await prisma.vendor.findMany({
+      where: {
+        name: {
+          contains: searchTerm,
+          mode: 'insensitive'
+        }
+      },
+      select: {
+        id: true,
+        name: true
+      },
+      take: 15,
+      orderBy: {
+        name: 'asc'
+      }
+    });
+
+    return { success: true, companies };
+  } catch (error) {
+    console.error('Error filtering company names:', error);
+    return { success: false, companies: [] };
+  }
+}
+
 export async function createForm(formData: FormData) {
   try {
     // Extract form data
     const companyName = formData.get("companyName") as string;
-    const industry = formData.get("industry") as string;
     const hasISO27001 = formData.get("hasISO27001") === "true";
     const iso27001ExpiryDate = formData.get("iso27001ExpiryDate") as string;
     const usesSSO = formData.get("usesSSO") === "true";
@@ -57,7 +86,7 @@ export async function createForm(formData: FormData) {
         
         // Company details
         companyName: companyName,
-        companyIndustry: industry,
+        companyIndustry: null, // remove for now
         
         // Review stuff
         status: "COMPLETED",
@@ -95,7 +124,9 @@ export async function createForm(formData: FormData) {
     });
     
     revalidatePath('/admin/vendors');
-    // redirect('/admin/vendors');
+
+    
+    return { success: true, vendorId: vendor.id };
     
   } catch (error) {
     console.error('Form submission error:', error);
@@ -103,3 +134,4 @@ export async function createForm(formData: FormData) {
   }
 }
     
+

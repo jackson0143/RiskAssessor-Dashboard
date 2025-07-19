@@ -1,6 +1,11 @@
-import { Home, HousePlus, Users} from "lucide-react";
+import { Home, HousePlus, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { User2 } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import { useClerk, useUser } from "@clerk/nextjs";
@@ -19,7 +24,6 @@ import {
   SidebarHeader,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-
 
 const items = [
   {
@@ -80,10 +84,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild
-                    isActive={pathname === item.url}
-                    >
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -94,26 +95,20 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-            
 
-            {/* Section 2 */}
+        {/* Section 2 */}
         <SidebarGroup>
           <SidebarGroupLabel>Form</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items2.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild
-                    isActive={pathname === item.url}
-                  
-                  >
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
-                
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
@@ -121,32 +116,37 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
+      {/* Footer */}
       <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <DropdownMenu >
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton>
-                    <User2 /> {user?.firstName || "User"}
-                    <ChevronUp className="ml-auto" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  side="top"
-                  className="w-[--radix-popper-anchor-width]"
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton>
+                  <User2 /> {user?.firstName || "User"}
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem
+                  onClick={() => (window.location.href = "/admin/settings")}
                 >
-                  <DropdownMenuItem onClick={() => window.location.href = "/admin/settings"}>
-                    <span>Account</span>
-                  </DropdownMenuItem>
-                 
-                                      <DropdownMenuItem onClick={() => signOut({redirectUrl: "/sign-in"})}>
-                      <span>Sign out</span>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
+                  <span>Account</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => signOut({ redirectUrl: "/sign-in" })}
+                >
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -3,15 +3,15 @@ import { createClient } from "@/utils/supabase/server";
 interface UploadFileParams {
   file: File;
   vendorName: string;
-  fileType: string; // e.g., 'iso27001', 'contract', 'certificate'
-  bucketName?: string; // defaults to 'vendor-uploads'
+  fileType: string; 
+  bucketName?: string; 
 }
 
 export async function uploadFile({
   file,
   vendorName,
   fileType,
-  bucketName = 'vendor-uploads'
+  bucketName = 'vendor-uploads'//default bucket name
 }: UploadFileParams): Promise<string | null> {
   try {
     const supabase = await createClient();

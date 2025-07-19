@@ -5,73 +5,110 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Clock, Users, Eye } from "lucide-react";
+import { Clock, Users, AlertTriangle, Calendar } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
+    
     <div className="p-6 space-y-6">
-      <header>
-        <h1 className="text-2xl font-bold mb-4">
-          Welcome to Allnex Risk Assessor
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold">
+          Dashboard
         </h1>
         <p className="text-muted-foreground">
-          Manage your vendor risk assessments and security compliance.
+          Overview of your vendor risk assessment program
         </p>
-      </header>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-        <Card className="gap-0">
-          <CardHeader className="flex flex-row items-center justify-between space-y-4 pb-2">
-            <CardTitle className="text-sm">Active Vendors</CardTitle>
+      </div>
+
+      {/* Stats Cards */}
+      {/*Grid of 4 cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Vendors</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-5xl">10</div>
-            <p className="text-sm text-muted-foreground">20 total vendors</p>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground">
+              No vendors yet
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="gap-2">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm">Assessment Progress</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
+            <CardTitle className="text-sm font-medium">Active Assessments</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-4xl">90%</div>
-            <Progress value={90} className="mt-2" />
-            <p className="text-sm text-muted-foreground mt-1">
-              [completedAssessments] of [numberOfVendors] completed
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground">
+              0% completion rate
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">High Risk Vendors</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-destructive">0</div>
+            <p className="text-xs text-muted-foreground">
+              No high risk vendors
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Due This Month</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground">
+              No reviews pending
             </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Risk Distribution */}
       <Card>
         <CardHeader>
-          <CardTitle>Active Vendor Risk Distribution</CardTitle>
+          <CardTitle>Risk Distribution</CardTitle>
           <CardDescription>
-            Risk levels across active vendors only
+            Current risk levels across all vendors
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-3xl text-destructive">2</div>
-              <div className="text-muted-foreground">High Risk</div>
+            <div className="text-center space-y-2">
+              <div className="text-3xl font-bold text-destructive">0</div>
+              <div className="text-sm text-muted-foreground">High Risk</div>
+              <Progress value={0} className="h-2" />
             </div>
-            <div className="text-center">
-              <div className="text-3xl text-yellow-600">7</div>
-              <div className="text-muted-foreground">Medium Risk</div>
+            <div className="text-center space-y-2">
+              <div className="text-3xl font-bold text-yellow-600">0</div>
+              <div className="text-sm text-muted-foreground">Medium Risk</div>
+              <Progress value={0} className="h-2" />
             </div>
-            <div className="text-center">
-              <div className="text-3xl text-green-600">1</div>
-              <div className="text-muted-foreground">Low Risk</div>
+            <div className="text-center space-y-2">
+              <div className="text-3xl font-bold text-green-600">0</div>
+              <div className="text-sm text-muted-foreground">Low Risk</div>
+              <Progress value={0} className="h-2" />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Action Cards */}
+      <div className="grid gap-6 md:grid-cols-2">
         {/* Pending Assessments */}
         <Card>
           <CardHeader>
@@ -81,38 +118,9 @@ export default function HomePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* {pendingAssessments.length === 0 ? (
-              <p className="text-muted-foreground">All vendors have completed assessments</p>
-            ) : ( */}
-            <div className="space-y-3">
-              {/* {pendingAssessments.slice(0, 5).map((vendor) => ( */}
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                {" "}
-                {/* key */}
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <h4>Vendor Name</h4>
-                    {/* <Badge fontVariant="secondary">
-                          Vendor Status
-                        </Badge> */}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Assessment pending
-                    {/* {vendor.questionnaireSent ? 'Questionnaire sent' : 'Assessment pending'} */}
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  // onClick={() => onViewVendor(vendor.id)}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
-              </div>
-              {/* ))} */}
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No pending assessments</p>
             </div>
-            {/* )} */}
           </CardContent>
         </Card>
 
@@ -121,42 +129,13 @@ export default function HomePage() {
           <CardHeader>
             <CardTitle>Upcoming Reviews</CardTitle>
             <CardDescription>
-              Active vendor reviews due in the next 30 days
+              Reviews due in the next 30 days
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* {upcomingReviews.length === 0 ? (
-              <p className="text-muted-foreground">No reviews due in the next 30 days</p>
-            ) : ( */}
-            <div className="space-y-3">
-              {/* {upcomingReviews.slice(0, 5).map((vendor) => ( */}
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                {" "}
-                {/* key */}
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <h4>Vendor Name</h4>
-                    {/* <Badge variant={getRiskBadgeVariant(vendor.riskLevel)}>
-                          {vendor.riskLevel}
-                        </Badge> */}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Due: [DATE]
-                    {/* Due: {vendor.nextReview ? new Date(vendor.nextReview).toLocaleDateString() : 'Not scheduled'} */}
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  // onClick={() => onViewVendor(vendor.id)}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
-              </div>
-              {/* ))} */}
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No reviews due</p>
             </div>
-            {/* )} */}
           </CardContent>
         </Card>
       </div>

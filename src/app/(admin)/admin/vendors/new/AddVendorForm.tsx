@@ -66,7 +66,7 @@ export default function AddVendorForm() {
       
       if (result.success) {
         // Redirect to vendors page
-        router.push('/vendors');
+        router.push('/admin/vendors');
       } else {
         setError('Failed to create vendor. Please try again.');
       }
@@ -95,7 +95,7 @@ export default function AddVendorForm() {
     <div className="p-6">
       {/* Header */}
       <div className="flex items-center space-x-4 mb-6">
-        <Link href="/vendors">
+        <Link href="/admin/vendors">
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back
@@ -309,7 +309,7 @@ export default function AddVendorForm() {
           </Card>
 
           <div className="flex justify-end space-x-2">
-            <Link href="/vendors">
+            <Link href="/admin/vendors">
               <Button
                 type="button"
                 variant="outline"
