@@ -26,6 +26,8 @@ interface VendorTableRowProps {
     riskScore: number;
     category: string | null;
     description: string | null;
+    lastReviewDate: Date | null;
+    nextReviewDate: Date | null;
     contacts: Contact[];
   };
 }
@@ -124,6 +126,27 @@ export function VendorTableRow({ vendor }: VendorTableRowProps) {
           </div>
         </div>
       </TableCell>
+
+      {/* Last Review Date */}
+      <TableCell>
+        <div className="text-sm">
+          {vendor.lastReviewDate 
+            ? new Date(vendor.lastReviewDate).toLocaleDateString()
+            : "Never"
+          }
+        </div>
+      </TableCell>
+
+      {/* Next Review Date */}
+      <TableCell>
+        <div className="text-sm">
+          {vendor.nextReviewDate 
+            ? new Date(vendor.nextReviewDate).toLocaleDateString()
+            : "Not scheduled"
+          }
+        </div>
+      </TableCell>
+
       <TableCell>
         <Link href={`/admin/vendors/${vendor.id}`}>
           <Button variant="outline" size="sm">

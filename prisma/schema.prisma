@@ -74,7 +74,8 @@ model Vendor {
   riskScore Int      @default(0)
   category String?
   description String?
-
+  lastReviewDate DateTime?
+  nextReviewDate DateTime?
 
   
   // Relations
@@ -90,18 +91,43 @@ model VendorReview {
   vendorId        String      @db.Uuid  
   vendor          Vendor      @relation(fields: [vendorId], references: [id])
   
+  // Review stuff
+  status          ReviewStatus @default(DRAFT)
   lastReviewDate  DateTime
   nextReviewDate  DateTime
-  status          ReviewStatus @default(DRAFT)
   reviewScore     Int?
   reviewNotes     String?
   
+  //////////////////////////////
+  //FORM STUFF
+  //////////////////////////////
+
+
+  // Company Details 
+  companyName     String?
+  companyIndustry String?
+  
+  // ISO-27001 Certification
+  hasISO27001     Boolean     @default(false)
+  isoCertUrl      String?     // URL to uploaded certificate
+  isoCertExpiryDate DateTime?
+  
+  // NIS2 Compliance Requirements
+  usesSSO         Boolean     @default(false)
+  usesMFA         Boolean     @default(false)
+  individualAccounts Boolean  @default(false)
+  roleBasedAccess Boolean     @default(false)
+  
+  // Timestamps
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
   answers         Answer[]
 }
 
+
+////////////////////////////////////////////////////////////
+//THIS IS A FUTURE FEATURE FOR DYNAMIC AND FLEXIBLE FORMS
 model Question {
   id           String       @id @default(uuid()) @db.Uuid
   questionText String
@@ -116,7 +142,7 @@ model Question {
   updatedAt       DateTime    @updatedAt
   answers      Answer[]
 }
-
+//THIS IS A FUTURE FEATURE FOR DYNAMIC AND FLEXIBLE FORMS
 model Answer {
   id         String   @id @default(uuid()) @db.Uuid
   reviewId   String   @db.Uuid  

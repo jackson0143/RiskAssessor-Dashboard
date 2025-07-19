@@ -53,14 +53,14 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
   //   return 'default';
   // };
 
-  // const getStatusBadgeVariant = (status: 'ACTIVE' | 'INACTIVE' | 'PENDING') => {
-  //   switch (status) {
-  //     case 'ACTIVE': return 'default';
-  //     case 'INACTIVE': return 'secondary';
-  //     case 'PENDING': return 'secondary';
-  //     default: return 'default';
-  //   }
-  // };
+  const getStatusBadgeVariant = (status: 'ACTIVE' | 'INACTIVE' | 'PENDING') => {
+    switch (status) {
+      case 'ACTIVE': return 'default';
+      case 'INACTIVE': return 'secondary';
+      case 'PENDING': return 'secondary';
+      default: return 'default';
+    }
+  };
 
 
 
@@ -77,17 +77,11 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
           </Link>
           <div>
             <h1 className="text-2xl font-bold">{vendor.name}</h1>
-            {/* <div className="flex items-center space-x-2 mt-1">
-              <Badge variant={getRiskBadgeVariant(vendor.riskScore)}>
-                {getRiskLevel(vendor.riskScore)} Risk
-              </Badge>
+            <div className="flex items-center space-x-2 mt-1">
               <Badge variant={getStatusBadgeVariant(vendor.status)}>
                 {vendor.status}
               </Badge>
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                Assessment Pending
-              </Badge>
-            </div> */}
+            </div>
           </div>
         </div>
         <div className="flex space-x-2">
@@ -179,6 +173,10 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
                     <div>
                       <label className="text-sm font-medium text-gray-500">Vendor ID</label>
                       <p className="text-lg font-mono text-sm">{vendor.id}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Description</label>
+                      <p className="text-lg">{vendor.description || 'No description provided'}</p>
                     </div>
                   </div>
                 </div>

@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { User2 } from "lucide-react";
 import { ChevronUp } from "lucide-react";
 import { useClerk, useUser } from "@clerk/nextjs";
-
+import Link from "next/link";
 // import { ModeToggle } from "@/components/mode-toggle";
 import {
   Sidebar,
@@ -36,6 +36,11 @@ const items = [
 
 const items2 = [
   {
+    title: "New Form",
+    url: "/admin/forms",
+    icon: HousePlus,
+  },
+  {
     title: "Questions",
     url: "/admin/questions",
     icon: HousePlus,
@@ -56,11 +61,11 @@ export function AppSidebar() {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <Link href="/">
                 <span className="text-base font-semibold text-[#1a1a1a]">
                   Allnex Risk Assessor
                 </span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -66,6 +66,8 @@ interface Vendor {
   riskScore: number;
   category: string | null;
   description: string | null;
+  lastReviewDate: Date | null;
+  nextReviewDate: Date | null;
   contacts: Contact[];
   createdAt: Date;
   updatedAt: Date;
@@ -321,6 +323,8 @@ export default function Vendors() {
                     <TableHead>Status</TableHead>
                     <TableHead>Risk Level</TableHead>
                     <TableHead>Primary Contact</TableHead>
+                    <TableHead>Last Review</TableHead>
+                    <TableHead>Next Review</TableHead>
                     <TableHead>Details</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -353,6 +357,12 @@ export default function Vendors() {
                           <Skeleton className="h-3 w-24" />
                           <Skeleton className="h-3 w-32" />
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-20" />
                       </TableCell>
                       <TableCell>
                         <Skeleton className="h-8 w-24" />
@@ -395,6 +405,8 @@ export default function Vendors() {
                     <TableHead>Status</TableHead>
                     <TableHead>Risk Level</TableHead>
                     <TableHead>Primary Contact</TableHead>
+                    <TableHead>Last Review</TableHead>
+                    <TableHead>Next Review</TableHead>
                     <TableHead>Details</TableHead>
                   </TableRow>
                 </TableHeader>
