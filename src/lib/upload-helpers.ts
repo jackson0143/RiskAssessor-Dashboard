@@ -42,13 +42,8 @@ export async function uploadFile({
       throw new Error(`Failed to upload ${fileType} file`);
     }
     
-    // Get public URL for the uploaded file
-    const { data: urlData } = supabase
-      .storage
-      .from(bucketName)
-      .getPublicUrl(filePath);
-    
-    return urlData.publicUrl;
+    // Return the file path instead of public URL
+    return filePath;
     
   } catch (error) {
     console.error('Upload helper error:', error);
@@ -79,4 +74,18 @@ export async function uploadVendorDocument(
     vendorName,
     fileType: documentType
   });
-} 
+}
+
+ 
+
+export async function getSignedUrl(filePath: string, bucketName: string = 'vendor-uploads') {
+    try {
+        const supabase = await createClient();
+        const { data, error } = await supabase.storage.from(bucketName).createSignedUrl(filePath, 3600);
+        if (error) throw error;
+        return data.signedUrl;
+    } catch (error) {
+        console.error('Error getting signed URL:', error);
+        throw new Error('Failed to get signed URL');
+    }
+}

@@ -8,7 +8,7 @@ import { getVendorById } from "../actions"
 import { SectionCards } from "@/components/section-cards"
 import { ChartBarMixed } from "@/components/bar-chart"
 import { getVendorReview } from "../actions"
-import { VendorReviewCard } from "@/components/vendor-review-card"
+import { VendorReviewCard } from "@/components/vendor-assessment-card"
 
 interface VendorDetailPageProps {
   params: Promise<{

@@ -3,15 +3,13 @@
 import { revalidatePath } from "next/cache";
 // import { redirect } from "next/navigation";
 import { PrismaClient } from '@prisma/client';
-import { uploadISO27001Certificate } from "@/lib/upload-helpers";
+import { uploadISO27001Certificate, getSignedUrl } from "@/lib/upload-helpers";
 
 const prisma = new PrismaClient();
 
 export async function filterCompanyNames(searchTerm: string) {
   try {
-    if (!searchTerm || searchTerm.trim().length < 2) {
-      return { success: true, companies: [] };
-    }
+
 
     const companies = await prisma.vendor.findMany({
       where: {
@@ -37,6 +35,16 @@ export async function filterCompanyNames(searchTerm: string) {
   }
 }
 
+export async function generateSignedUrl(filePath: string) {
+  try {
+    const signedUrl = await getSignedUrl(filePath);
+    return { success: true, signedUrl };
+  } catch (error) {
+    console.error('Error generating signed URL:', error);
+    return { success: false, signedUrl: null };
+  }
+}
+
 export async function createForm(formData: FormData) {
   try {
     // Extract form data
@@ -50,14 +58,14 @@ export async function createForm(formData: FormData) {
     const additionalNotes = formData.get("additionalNotes") as string;
     
     // Handle file upload of ISO27001 cert 
-    let isoCertUrl: string | null = null;
+    let isoCertFilePath: string | null = null;
     
     if (hasISO27001) {
       const iso27001File = formData.get("iso27001File") as File;
       
       if (iso27001File && iso27001File.size > 0) {
         try {
-          isoCertUrl = await uploadISO27001Certificate(iso27001File, companyName);
+          isoCertFilePath = await uploadISO27001Certificate(iso27001File, companyName);
         } catch (error) {
           console.error('ISO-27001 certificate upload failed:', error);
           throw new Error('Failed to upload ISO-27001 certificate');
@@ -96,7 +104,7 @@ export async function createForm(formData: FormData) {
         
         // ISO-27001 cert stuff
         hasISO27001: hasISO27001,
-        isoCertUrl: isoCertUrl,
+        isoCertUrl: isoCertFilePath,
         isoCertExpiryDate: iso27001ExpiryDate ? new Date(iso27001ExpiryDate) : null,
         
         // NIS2 compliance stuff

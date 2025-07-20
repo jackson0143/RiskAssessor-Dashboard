@@ -1,6 +1,9 @@
+"use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { VendorReview } from "@prisma/client";
+import { generateSignedUrl } from "@/app/(admin)/admin/forms/actions";
+import { useState, useEffect } from "react";
 
 interface VendorReviewCardProps {
   review: VendorReview;
@@ -8,7 +11,27 @@ interface VendorReviewCardProps {
 }
 
 export function VendorReviewCard({ review }: VendorReviewCardProps) {
+  const [certificateUrl, setCertificateUrl] = useState<string | null>(null);
 
+  // Server action to actually generate the signed url, workaround for the client side component
+  useEffect(() => {
+    const fetchSignedUrl = async () => {
+      if (review.isoCertUrl) {
+        try {
+          const result = await generateSignedUrl(review.isoCertUrl);
+          if (result.success) {
+            setCertificateUrl(result.signedUrl);
+          }
+        } catch (error) {
+          console.error('Error generating signed URL:', error);
+        }
+      }
+    };
+
+    fetchSignedUrl();
+    //we render when the review.isoCertUrl changes, but technically it shouldnt change anyways, so we can leave it empty? maybe
+  }, [review.isoCertUrl]);
+ 
   const YesNoBadge = ({ value }: { value: boolean }) => (
     <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
       value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -105,10 +128,10 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
                 <QuestionDisplay question="When does your certificate expire?">
                   <AnswerDisplay value={review.isoCertExpiryDate ? new Date(review.isoCertExpiryDate).toLocaleDateString() : null} />
                 </QuestionDisplay>
-                {review.isoCertUrl && (
+                {review.isoCertUrl && certificateUrl && (
                   <QuestionDisplay question="Certificate file">
                     <a 
-                      href={review.isoCertUrl} 
+                      href={certificateUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
