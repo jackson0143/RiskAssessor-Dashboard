@@ -128,7 +128,7 @@ export async function createForm(formData: FormData) {
     // Update the review with calculated score (CUSTOMISE LATER and use the update more)
     await prisma.vendorReview.update({
       where: { id: vendorReview.id },
-      data: { reviewScore: Math.max(0, riskScore) }
+      data: { riskScore: Math.max(0, riskScore) }
     });
     
     revalidatePath('/admin/vendors');

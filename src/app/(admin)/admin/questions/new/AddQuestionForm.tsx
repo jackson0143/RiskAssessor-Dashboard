@@ -61,7 +61,7 @@ export default function AddQuestionForm() {
         });
         
         // Redirect to questions page
-        router.push('/questions');
+        router.push('/admin/questions');
       } else {
         setError(result.message || 'Failed to add question. Please try again.');
       }
@@ -104,7 +104,7 @@ export default function AddQuestionForm() {
     <div className="p-6">
       {/* Header */}
       <div className="flex items-center space-x-4 mb-6">
-        <Link href="/questions">
+        <Link href="/admin/questions">
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back
@@ -198,16 +198,16 @@ export default function AddQuestionForm() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="weight">Weight *</Label>
+                  <Label htmlFor="weight">Weight (0-100) *</Label>
                   <Input
                     type="number"
                     id="weight"
                     value={formData.weight}
                     onChange={(e) => handleChange('weight', e.target.value)}
-                    placeholder="0.00"
+                    placeholder="0"
                     min="0"
-                    max="1"
-                    step="0.01"
+                    max="100"
+                
                     required
                   />
                 </div>

@@ -56,13 +56,7 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
   );
 
 
-  const getRiskLevel = (score: number) => {
-    if (score >= 80) return { text: 'High Risk', class: 'bg-red-100 text-red-800' };
-    if (score >= 60) return { text: 'Medium Risk', class: 'bg-yellow-100 text-yellow-800' };
-    return { text: 'Low Risk', class: 'bg-green-100 text-green-800' };
-  };
 
-  const riskLevel = review.reviewScore ? getRiskLevel(review.reviewScore) : null;
 
   return (
     <Card>
@@ -75,7 +69,7 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
               Completed on {new Date(review.createdAt).toLocaleDateString()}
             </p>
           </div>
-          {review.reviewScore && (
+          {/* {review.reviewScore && (
             <div className="text-center">
               <div className="bg-background rounded-lg p-4 shadow-sm border">
                 <div className="text-2xl font-bold">{review.reviewScore}</div>
@@ -85,7 +79,7 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </CardHeader>
 
@@ -147,9 +141,9 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
 
         <Separator />
 
-        {/* NIS2 Compliance */}
+       
         <div>
-          <CardTitle className="text-lg mb-4">NIS2 Compliance Requirements</CardTitle>
+          <CardTitle className="text-lg mb-4">Security Maturity Questions</CardTitle>
           <div className="space-y-4">
             <QuestionDisplay question="Do you use Single Sign-On (SSO)?">
               <YesNoBadge value={review.usesSSO} />

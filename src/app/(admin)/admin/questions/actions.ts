@@ -20,9 +20,9 @@ export async function addQuestion(formData: FormData) {
     return { success: false, message: 'Missing required fields' };
   }
 
-  const weightValue = parseFloat(weight);
-  if (isNaN(weightValue) || weightValue < 0 || weightValue > 1) {
-    return { success: false, message: 'Weight must be a number between 0 and 1' };
+  const weightValue = parseInt(weight);
+  if (isNaN(weightValue) || weightValue < 0 || weightValue > 100) {
+    return { success: false, message: 'Weight must be a number between 0 and 100' };
   }
 
   // JSON

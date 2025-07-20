@@ -6,9 +6,10 @@ import { ArrowLeft, Edit, Mail, Phone, AlertTriangle, User, Building } from "luc
 import Link from "next/link"
 import { getVendorById } from "../actions"
 import { SectionCards } from "@/components/section-cards"
-import { ChartBarMixed } from "@/components/bar-chart"
+
 import { getVendorReview } from "../actions"
 import { VendorReviewCard } from "@/components/vendor-assessment-card"
+import { RiskAssessmentFramework } from "@/components/risk-assessment-framework"
 
 interface VendorDetailPageProps {
   params: Promise<{
@@ -22,7 +23,6 @@ interface VendorReview {
   status: 'DRAFT' | 'COMPLETED' | 'PENDING' | 'APPROVED';
   lastReviewDate: Date;
   nextReviewDate: Date;
-  reviewScore: number | null;
   reviewNotes: string | null;
   companyName: string | null;
   companyIndustry: string | null;
@@ -33,6 +33,12 @@ interface VendorReview {
   usesMFA: boolean;
   individualAccounts: boolean;
   roleBasedAccess: boolean;
+  riskScore: number | null;
+  impactScore: number | null;
+  maturityScore: number | null;
+  riskRating: string | null;
+  maturityRating: string | null;
+  impactRating: string | null;
   createdAt: Date;
   updatedAt: Date;
   vendor: {
@@ -119,14 +125,22 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
               <div>
                 <h2 className="text-xl font-semibold mb-4">Risk Assessment Overview</h2>
                 <SectionCards 
-                  overallRiskScore={vendor.riskScore}
-                  cyberResilienceRating={0} 
-                  securityControlCompliance={0} 
-                  incidentResponseCapability={0} 
+                  overallRiskRating="Medium"
+                  impactLevel="Medium"
+                  securityMaturityLevel="Medium"
                 />
               </div>
 
-              {/* Charts Section */}
+              {/* Risk Assessment Framework */}
+              <div>
+                <RiskAssessmentFramework 
+                  impactLevel="Medium"
+                  securityMaturity="High"
+                  showCurrentAssessment={true}
+                />
+              </div>
+{/* 
+        
               <div>
                 <div className="grid grid-cols-1 lg:grid-cols-20 gap-6">
                   <div className="lg:col-span-13">
@@ -138,7 +152,7 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </TabsContent>
 
