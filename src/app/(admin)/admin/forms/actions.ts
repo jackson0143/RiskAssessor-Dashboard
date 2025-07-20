@@ -113,7 +113,18 @@ export async function createForm(formData: FormData) {
         individualAccounts: individualAccounts,
         roleBasedAccess: roleBasedAccess,
       }
+      
     });
+
+    await prisma.vendor.update({
+      where: {
+        id: vendor.id,
+      },
+      data : {
+        lastReviewDate: new Date(),
+        nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+      }
+    })
     
     //calculate risk score (CUSTOMISE LATER)
     let riskScore = 100; // Start with perfect score
