@@ -7,8 +7,27 @@ import {
 } from "@/components/ui/card";
 import { Clock, Users, AlertTriangle, Calendar } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { getDashboardStats } from "./actions";
+import { Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const stats = await getDashboardStats();
+
+  const getRiskBadgeVariant = (risk: string | null) => {
+    switch (risk) {
+      case "HIGH":
+        return "destructive";
+      case "MEDIUM":
+        return "secondary";
+      case "LOW":
+        return "default";
+      default:
+        return "default";
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -28,8 +47,14 @@ export default function HomePage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">No vendors yet</p>
+            {stats.totalVendors ? (
+              <div className="text-2xl font-bold">{stats.totalVendors}</div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">0</div>
+                <p className="text-xs text-muted-foreground">No vendors yet</p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -54,10 +79,23 @@ export default function HomePage() {
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">0</div>
-            <p className="text-xs text-muted-foreground">
-              No high risk vendors
-            </p>
+            {stats.highRiskVendorCount ? (
+              <>
+                <div className="text-2xl font-bold text-destructive">
+                  {stats.highRiskVendorCount}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Requires attention
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-destructive">0</div>
+                <p className="text-xs text-muted-foreground">
+                  No high risk vendors
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -69,8 +107,19 @@ export default function HomePage() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">No reviews pending</p>
+            {stats.dueThisMonth ? (
+              <>
+                <div className="text-2xl font-bold">{stats.dueThisMonth}</div>
+                <p className="text-xs text-muted-foreground">Reviews pending</p>
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">0</div>
+                <p className="text-xs text-muted-foreground">
+                  No reviews pending
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -86,19 +135,44 @@ export default function HomePage() {
         <CardContent>
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-destructive">0</div>
+              <div className="text-3xl font-bold text-destructive">
+                {stats.highRiskVendorCount}
+              </div>
               <div className="text-sm text-muted-foreground">High Risk</div>
-              <Progress value={0} className="h-2" />
+              <Progress
+                value={
+                  (stats.highRiskVendorCount / stats.totalAssessedVendorCount) *
+                  100
+                }
+                className="h-2"
+              />
             </div>
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-yellow-600">0</div>
+              <div className="text-3xl font-bold text-yellow-600">
+                {stats.mediumRiskVendorCount}
+              </div>
               <div className="text-sm text-muted-foreground">Medium Risk</div>
-              <Progress value={0} className="h-2" />
+              <Progress
+                value={
+                  (stats.mediumRiskVendorCount /
+                    stats.totalAssessedVendorCount) *
+                  100
+                }
+                className="h-2"
+              />
             </div>
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-green-600">0</div>
+              <div className="text-3xl font-bold text-green-600">
+                {stats.lowRiskVendorCount}
+              </div>
               <div className="text-sm text-muted-foreground">Low Risk</div>
-              <Progress value={0} className="h-2" />
+              <Progress
+                value={
+                  (stats.lowRiskVendorCount / stats.totalAssessedVendorCount) *
+                  100
+                }
+                className="h-2"
+              />
             </div>
           </div>
         </CardContent>
@@ -128,9 +202,50 @@ export default function HomePage() {
             <CardDescription>Reviews due in the next 30 days</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No reviews due</p>
-            </div>
+            {/* Will need to add Pagination? */}
+            {(await stats.upcomingReviews).length ? (
+              <div className="space-y-3">
+                {(await stats.upcomingReviews).map((upcomingReview) => (
+                  <div
+                    key={upcomingReview.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <h4>{upcomingReview.name}</h4>
+                        <Badge
+                          variant={getRiskBadgeVariant(
+                            upcomingReview.riskRating
+                          )}
+                        >
+                          {upcomingReview.riskRating}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Due:{" "}
+                        {upcomingReview.nextReviewDate
+                          ? new Date(
+                              upcomingReview.nextReviewDate
+                            ).toLocaleDateString()
+                          : "Not scheduled"}
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      // onClick={() => onViewVendor(vendor.id)}
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No reviews due</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
