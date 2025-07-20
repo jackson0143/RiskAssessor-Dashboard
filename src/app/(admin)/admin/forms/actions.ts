@@ -7,6 +7,83 @@ import { uploadISO27001Certificate, getSignedUrl } from "@/lib/upload-helpers";
 
 const prisma = new PrismaClient();
 
+//MATURITY RATING
+function getMaturityRating(securityFields: {
+  hasISO27001: boolean;
+  usesSSO: boolean;
+  usesMFA: boolean;
+  individualAccounts: boolean;
+  roleBasedAccess: boolean;
+  formalManagementSystem: boolean;
+}): { score: number; rating: 'LOW' | 'MEDIUM' | 'HIGH' } {
+  let score = 100; // Start with 100
+  
+
+  if (!securityFields.hasISO27001) score -= 20; // ISO27001 subtracts 20
+  if (!securityFields.usesSSO) score -= 5;
+  if (!securityFields.usesMFA) score -= 5;
+  if (!securityFields.individualAccounts) score -= 5;
+  if (!securityFields.roleBasedAccess) score -= 5;
+  if (!securityFields.formalManagementSystem) score -= 5;
+  
+
+  score = Math.max(0, score);
+  
+
+  let rating: 'LOW' | 'MEDIUM' | 'HIGH';
+  if (score > 80) {
+    rating = 'HIGH';
+  } else if (score >= 50) {
+    rating = 'MEDIUM';
+  } else {
+    rating = 'LOW';
+  }
+  
+  return { score: Math.round(score), rating };
+}
+
+
+function getImpactRating(impactFields: {
+  requirePersonalData: boolean;
+  requireSystemAccess: boolean;
+}): { score: number; rating: 'LOW' | 'MEDIUM' | 'HIGH' } {
+  let score = 100;
+  
+  if (impactFields.requirePersonalData) score -= 20;
+  if (impactFields.requireSystemAccess) score -= 20;
+  
+  score = Math.max(0, score);
+  
+  let rating: 'LOW' | 'MEDIUM' | 'HIGH';
+  if (score > 80) {
+    rating = 'LOW'; 
+  } else if (score > 60) {
+    rating = 'MEDIUM'; 
+  } else {
+    rating = 'HIGH'; 
+  }
+  
+  return { score: Math.round(score), rating };
+}
+
+//RISK RATING
+function getRiskRating(impactRating: 'LOW' | 'MEDIUM' | 'HIGH', maturityRating: 'LOW' | 'MEDIUM' | 'HIGH'): 'LOW' | 'MEDIUM' | 'HIGH' {
+  if (impactRating === 'LOW') {
+    if (maturityRating === 'HIGH' || maturityRating === 'MEDIUM') return 'LOW';
+    return 'MEDIUM';
+  }
+  if (impactRating === 'MEDIUM') {
+    if (maturityRating === 'HIGH') return 'LOW';
+    if (maturityRating === 'MEDIUM') return 'MEDIUM';
+    return 'HIGH';
+  }
+  if (impactRating === 'HIGH') {
+    if (maturityRating === 'HIGH') return 'MEDIUM';
+    return 'HIGH';
+  }
+  return 'MEDIUM';
+}
+
 export async function filterCompanyNames(searchTerm: string) {
   try {
 
@@ -47,7 +124,6 @@ export async function generateSignedUrl(filePath: string) {
 
 export async function createForm(formData: FormData) {
   try {
-    // Extract form data
     const companyName = formData.get("companyName") as string;
     const hasISO27001 = formData.get("hasISO27001") === "true";
     const iso27001ExpiryDate = formData.get("iso27001ExpiryDate") as string;
@@ -55,11 +131,14 @@ export async function createForm(formData: FormData) {
     const usesMFA = formData.get("usesMFA") === "true";
     const individualAccounts = formData.get("individualAccounts") === "true";
     const roleBasedAccess = formData.get("roleBasedAccess") === "true";
-    const additionalNotes = formData.get("additionalNotes") as string;
+    const formalManagementSystem = formData.get("formalManagementSystem") === "true";
+    const additionalNotesMaturity = formData.get("additionalNotesMaturity") as string;
+    const requirePersonalData = formData.get("requirePersonalData") === "true";
+    const requireSystemAccess = formData.get("requireSystemAccess") === "true";
+    const additionalNotesImpact = formData.get("additionalNotesImpact") as string;
     
     // Handle file upload of ISO27001 cert 
     let isoCertFilePath: string | null = null;
-    
     if (hasISO27001) {
       const iso27001File = formData.get("iso27001File") as File;
       
@@ -87,50 +166,80 @@ export async function createForm(formData: FormData) {
       });
     }
     
+    // calculate maturity rating
+    const maturityResult = getMaturityRating({
+      hasISO27001,
+      usesSSO,
+      usesMFA,
+      individualAccounts,
+      roleBasedAccess,
+      formalManagementSystem
+    });
+
+    // calculate impact rating
+    const impactResult = getImpactRating({
+      requirePersonalData,
+      requireSystemAccess
+    });
+
+    // calculate overall risk rating
+    const riskRating = getRiskRating(impactResult.rating, maturityResult.rating);
+
     // Create vendor review with all the form data
-    const vendorReview = await prisma.vendorReview.create({
+    await prisma.vendorReview.create({
       data: {
         vendorId: vendor.id,
         
         // Company details
         companyName: companyName,
-        companyIndustry: null, // remove for now
-        
-        // Review stuff
         status: "COMPLETED",
         lastReviewDate: new Date(),
         nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-        reviewNotes: additionalNotes,
-        
-        // ISO-27001 cert stuff
+
+        // File upload ISO27001
         hasISO27001: hasISO27001,
         isoCertUrl: isoCertFilePath,
         isoCertExpiryDate: iso27001ExpiryDate ? new Date(iso27001ExpiryDate) : null,
         
-        // NIS2 compliance stuff
+
+        //impact stuff
+        requirePersonalData: requirePersonalData,
+        requireSystemAccess: requireSystemAccess,
+        
+        // Security Maturity stuff
         usesSSO: usesSSO,
         usesMFA: usesMFA,
         individualAccounts: individualAccounts,
         roleBasedAccess: roleBasedAccess,
+        formalManagementSystem: formalManagementSystem,
+        
+
+        //Additional Info
+        additionalNotesMaturity: additionalNotesMaturity,
+        additionalNotesImpact: additionalNotesImpact,
+
+        // Calculated scores
+        maturityScore: maturityResult.score,
+        maturityRating: maturityResult.rating,
+        impactScore: impactResult.score,
+        impactRating: impactResult.rating,
+        riskRating: riskRating,
+      }
+    });
+
+    await prisma.vendor.update({
+      where: { id: vendor.id },
+      data: {
+        maturityScore: maturityResult.score,
+        maturityRating: maturityResult.rating,
+        impactScore: impactResult.score,
+        impactRating: impactResult.rating,
+        riskRating: riskRating,
       }
     });
     
-    //calculate risk score (CUSTOMISE LATER)
-    let riskScore = 100; // Start with perfect score
-    
-    if (!hasISO27001) riskScore -= 20;
-    if (!usesSSO) riskScore -= 15;
-    if (!usesMFA) riskScore -= 15;
-    if (!individualAccounts) riskScore -= 10;
-    if (!roleBasedAccess) riskScore -= 10;
-    
 
-    // Update the review with calculated score (CUSTOMISE LATER and use the update more)
-    await prisma.vendorReview.update({
-      where: { id: vendorReview.id },
-      data: { riskScore: Math.max(0, riskScore) }
-    });
-    
+
     revalidatePath('/admin/vendors');
 
     

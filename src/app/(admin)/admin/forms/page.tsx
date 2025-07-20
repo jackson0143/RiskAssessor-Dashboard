@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Upload, Building, Shield, FileText, CheckCircle, ChevronDown, Check } from "lucide-react";
+import { Upload, Building, Shield, FileText, CheckCircle, ChevronDown, Check, AlertTriangle } from "lucide-react";
 import { createForm, filterCompanyNames } from "./actions";
 import { useRouter } from "next/navigation";
 import useDebounce from "@/hooks/useDebounce";
@@ -25,14 +25,18 @@ interface FormData {
   iso27001File: File | null;
   iso27001ExpiryDate: string;
   
-  // NIS2 Compliance
+  // Security Maturity
   usesSSO: boolean;
   usesMFA: boolean;
   individualAccounts: boolean;
   roleBasedAccess: boolean;
+  formalManagementSystem: boolean;
+  additionalNotesMaturity: string;
   
-  // Additional Notes
-  additionalNotes: string;
+  // Impact Assessment
+  requirePersonalData: boolean;
+  requireSystemAccess: boolean;
+  additionalNotesImpact: string;
 }
 
 interface Company {
@@ -51,7 +55,11 @@ export default function FormsPage() {
     usesMFA: false,
     individualAccounts: false,
     roleBasedAccess: false,
-    additionalNotes: "",
+    formalManagementSystem: false,
+    additionalNotesMaturity: "",
+    requirePersonalData: false,
+    requireSystemAccess: false,
+    additionalNotesImpact: "",
   });
 
   // Company search state
@@ -62,7 +70,7 @@ export default function FormsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // USEEFFECT 1 : search for companies and debounce
+  // USEEFFECT 1 : search for vendors and debounce
   useEffect(() => {
     const searchCompanies = async () => {
       setIsSearching(true);
@@ -108,6 +116,13 @@ export default function FormsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.companyName.trim()) {
+      alert("Please select a vendor name");
+      return;
+    }
+    
     setIsLoading(true);
     
     const formDataToSubmit = new FormData();
@@ -118,7 +133,11 @@ export default function FormsPage() {
     formDataToSubmit.append("usesMFA", formData.usesMFA.toString());
     formDataToSubmit.append("individualAccounts", formData.individualAccounts.toString());
     formDataToSubmit.append("roleBasedAccess", formData.roleBasedAccess.toString());
-    formDataToSubmit.append("additionalNotes", formData.additionalNotes);
+    formDataToSubmit.append("formalManagementSystem", formData.formalManagementSystem.toString());
+    formDataToSubmit.append("additionalNotesMaturity", formData.additionalNotesMaturity);
+    formDataToSubmit.append("requirePersonalData", formData.requirePersonalData.toString());
+    formDataToSubmit.append("requireSystemAccess", formData.requireSystemAccess.toString());
+    formDataToSubmit.append("additionalNotesImpact", formData.additionalNotesImpact);
     
     if (formData.iso27001File) {
       formDataToSubmit.append("iso27001File", formData.iso27001File);
@@ -143,22 +162,22 @@ export default function FormsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Vendor Security Assessment Form</h1>
         <p className="text-muted-foreground">
-          Please complete this security assessment form to help us evaluate your organization&apos;s security.
+          Please complete this security assessment form to help us evaluate your organisation&apos;s security.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Company Details Section */}
+    
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building className="h-5 w-5" />
-              Company Details
+              Vendor Details
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Label htmlFor="companyName">Company Name *</Label>
+              <Label htmlFor="companyName">Vendor Name *</Label>
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -167,14 +186,14 @@ export default function FormsPage() {
                     aria-expanded={open}
                     className="w-full justify-between"
                   >
-                    {formData.companyName || "Search for a company..."}
+                    {formData.companyName || "Search for a vendor..."}
                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-full p-0" align="start">
                   <Command>
                     <CommandInput
-                      placeholder="Search companies..."
+                      placeholder="Search vendors..."
                       value={searchTerm}
                       onValueChange={handleCompanyInputChange}
                     />
@@ -274,17 +293,16 @@ export default function FormsPage() {
           </CardContent>
         </Card>
 
-        {/* NIS2 Compliance Section */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5" />
-              NIS2 Compliance Requirements
+              Security Maturity Requirements
             </CardTitle>
             <div className="flex items-center gap-2 mt-2">
-              <Badge variant="secondary">NIS2 Directive</Badge>
+              <Badge variant="secondary">Security Maturity</Badge>
               <span className="text-sm text-muted-foreground">
-                Based on Network and Information Security 2 compliance requirements
+                Based on the security maturity of your organisation
               </span>
             </div>
           </CardHeader>
@@ -297,7 +315,7 @@ export default function FormsPage() {
                   onCheckedChange={(checked: boolean) => handleInputChange("usesSSO", checked)}
                 />
                 <Label htmlFor="usesSSO" className="text-base">
-                  Do you use Single Sign-On (SSO)?
+                Do you use Single Sign-On (SSO) for your critical applications?
                 </Label>
               </div>
 
@@ -308,7 +326,7 @@ export default function FormsPage() {
                   onCheckedChange={(checked: boolean) => handleInputChange("usesMFA", checked)}
                 />
                 <Label htmlFor="usesMFA" className="text-base">
-                  Do you use Multi-Factor Authentication (MFA)?
+                Do you enforce Multi-Factor Authentication (MFA) on all user logins?
                 </Label>
               </div>
 
@@ -319,7 +337,7 @@ export default function FormsPage() {
                   onCheckedChange={(checked: boolean) => handleInputChange("individualAccounts", checked)}
                 />
                 <Label htmlFor="individualAccounts" className="text-base">
-                  Are you using individual accounts (no sharing of same account)?
+                Are all users in your company assigned individual accounts (i.e. no shared credentials)?
                 </Label>
               </div>
 
@@ -330,31 +348,83 @@ export default function FormsPage() {
                   onCheckedChange={(checked: boolean) => handleInputChange("roleBasedAccess", checked)}
                 />
                 <Label htmlFor="roleBasedAccess" className="text-base">
-                  Do you enforce role-based access controls (or equivalent) on all critical systems?
+                Do you enforce Role-Based Access Control (or equivalent) on critical systems?
                 </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="formalManagementSystem"
+                  checked={formData.formalManagementSystem}
+                  onCheckedChange={(checked: boolean) => handleInputChange("formalManagementSystem", checked)}
+                />
+                <Label htmlFor="formalManagementSystem" className="text-base">
+                Do you maintain a formal, documented Information Security Management System?
+                </Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="additionalNotesMaturity">Additional Information about Security Maturity</Label>
+                <Textarea
+                  id="additionalNotesMaturity"
+                  value={formData.additionalNotesMaturity}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange("additionalNotesMaturity", e.target.value)}
+                  placeholder="Please provide any additional information about your security practices, certifications, or compliance measures..."
+                  rows={3}
+                />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Additional Notes Section */}
+        {/* Impact Assessment Section */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Additional Notes
+              <AlertTriangle className="h-5 w-5" />
+              Impact Assessment
             </CardTitle>
+            <div className="flex items-center gap-2 mt-2">
+              <Badge variant="secondary">Business Impact</Badge>
+              <span className="text-sm text-muted-foreground">
+                Understanding the scope of access and data requirements
+              </span>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="additionalNotes">Additional Information</Label>
-              <Textarea
-                id="additionalNotes"
-                value={formData.additionalNotes}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange("additionalNotes", e.target.value)}
-                placeholder="Please provide any additional information about your security practices, certifications, or compliance measures..."
-                rows={4}
-              />
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="requirePersonalData"
+                  checked={formData.requirePersonalData}
+                  onCheckedChange={(checked: boolean) => handleInputChange("requirePersonalData", checked)}
+                />
+                <Label htmlFor="requirePersonalData" className="text-base">
+                  Do you require access to Allnex information and/or personal data?
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="requireSystemAccess"
+                  checked={formData.requireSystemAccess}
+                  onCheckedChange={(checked: boolean) => handleInputChange("requireSystemAccess", checked)}
+                />
+                <Label htmlFor="requireSystemAccess" className="text-base">
+                  Do you need access to Allnex internal or sensitive systems?
+                </Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="additionalNotesImpact">Additional Information about Impacts</Label>
+                <Textarea
+                  id="additionalNotesImpact"
+                  value={formData.additionalNotesImpact}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange("additionalNotesImpact", e.target.value)}
+                  placeholder="Please provide any additional information about the impacts, data access requirements, or system integration needs..."
+                  rows={3}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>

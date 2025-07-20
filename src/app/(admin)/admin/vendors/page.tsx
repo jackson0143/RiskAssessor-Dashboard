@@ -56,9 +56,12 @@ interface Vendor {
   ownerName: string | null;
   status: "ACTIVE" | "INACTIVE" | "PENDING";
   website: string | null;
-  securityMaturity: string | null;
-  impact: string | null;
-  riskScore: number;
+  maturityScore: number | null;
+  maturityRating: string | null;
+  impactScore: number | null;
+  impactRating: string | null;
+  riskScore: number | null;
+  riskRating: string | null;
   category: string | null;
   description: string | null;
   lastReviewDate: Date | null;

@@ -25,7 +25,6 @@ interface VendorReview {
   nextReviewDate: Date;
   reviewNotes: string | null;
   companyName: string | null;
-  companyIndustry: string | null;
   hasISO27001: boolean;
   isoCertUrl: string | null;
   isoCertExpiryDate: Date | null;
@@ -33,12 +32,17 @@ interface VendorReview {
   usesMFA: boolean;
   individualAccounts: boolean;
   roleBasedAccess: boolean;
+  formalManagementSystem: boolean;
   riskScore: number | null;
   impactScore: number | null;
   maturityScore: number | null;
   riskRating: string | null;
   maturityRating: string | null;
   impactRating: string | null;
+  additionalNotesMaturity: string | null;
+  requirePersonalData: boolean;
+  requireSystemAccess: boolean;
+  additionalNotesImpact: string | null;
   createdAt: Date;
   updatedAt: Date;
   vendor: {
@@ -125,17 +129,18 @@ export default async function VendorDetailPage({ params }: VendorDetailPageProps
               <div>
                 <h2 className="text-xl font-semibold mb-4">Risk Assessment Overview</h2>
                 <SectionCards 
-                  overallRiskRating="Medium"
-                  impactLevel="Medium"
-                  securityMaturityLevel="Medium"
+                  overallRiskRating={(vendor.riskRating as 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A') || "N/A"}
+                  impactLevel={(vendor.impactRating as 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A') || "N/A"}
+                  securityMaturityLevel={(vendor.maturityRating as 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A') || "N/A"}
                 />
               </div>
 
               {/* Risk Assessment Framework */}
               <div>
                 <RiskAssessmentFramework 
-                  impactLevel="Medium"
-                  securityMaturity="High"
+                  impactLevel={(vendor.impactRating as 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A') || "N/A"}
+                  securityMaturity={(vendor.maturityRating as 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A') || "N/A"}
+                  riskRating={(vendor.riskRating as 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A') || "N/A"}
                   showCurrentAssessment={true}
                 />
               </div>

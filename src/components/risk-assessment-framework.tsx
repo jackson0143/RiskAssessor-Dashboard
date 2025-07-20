@@ -3,35 +3,29 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface RiskAssessmentFrameworkProps {
-  impactLevel?: 'Low' | 'Medium' | 'High';
-  securityMaturity?: 'High' | 'Medium' | 'Low';
+  impactLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A';
+  securityMaturity?: 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A';
+  riskRating?: 'LOW' | 'MEDIUM' | 'HIGH' | 'N/A';
   showCurrentAssessment?: boolean;
 }
 
 export function RiskAssessmentFramework({ 
   impactLevel, 
   securityMaturity, 
+  riskRating,
   showCurrentAssessment = false 
 }: RiskAssessmentFrameworkProps) {
   
-  const getRiskLevel = (impact: string, maturity: string) => {
-    if (impact === 'Low') {
-      if (maturity === 'High' || maturity === 'Medium') return { level: 'Low', color: 'bg-green-100 text-green-800' };
-      return { level: 'Medium', color: 'bg-yellow-100 text-yellow-800' };
+  const getRiskColor = (rating: string) => {
+    switch (rating) {
+      case 'LOW': return 'bg-green-100 text-green-800';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
+      case 'HIGH': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
-    if (impact === 'Medium') {
-      if (maturity === 'High') return { level: 'Low', color: 'bg-green-100 text-green-800' };
-      if (maturity === 'Medium') return { level: 'Medium', color: 'bg-yellow-100 text-yellow-800' };
-      return { level: 'High', color: 'bg-red-100 text-red-800' };
-    }
-    if (impact === 'High') {
-      if (maturity === 'High') return { level: 'Medium', color: 'bg-yellow-100 text-yellow-800' };
-      return { level: 'High', color: 'bg-red-100 text-red-800' };
-    }
-    return { level: 'Unknown', color: 'bg-gray-100 text-gray-800' };
   };
 
-  const currentRisk = impactLevel && securityMaturity ? getRiskLevel(impactLevel, securityMaturity) : null;
+  const currentRisk = riskRating ? { level: riskRating, color: getRiskColor(riskRating) } : null;
 
   return (
     <div className="space-y-6">

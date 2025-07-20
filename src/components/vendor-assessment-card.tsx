@@ -1,6 +1,7 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { VendorReview } from "@prisma/client";
 import { generateSignedUrl } from "@/app/(admin)/admin/forms/actions";
 import { useState, useEffect } from "react";
@@ -13,24 +14,18 @@ interface VendorReviewCardProps {
 export function VendorReviewCard({ review }: VendorReviewCardProps) {
   const [certificateUrl, setCertificateUrl] = useState<string | null>(null);
 
-  // Server action to actually generate the signed url, workaround for the client side component
+  // find a fix to this, it's a bit of a cheaty way
   useEffect(() => {
-    const fetchSignedUrl = async () => {
-      if (review.isoCertUrl) {
-        try {
-          const result = await generateSignedUrl(review.isoCertUrl);
-          if (result.success) {
-            setCertificateUrl(result.signedUrl);
-          }
-        } catch (error) {
-          console.error('Error generating signed URL:', error);
+    if (review.isoCertUrl && !certificateUrl) {
+      generateSignedUrl(review.isoCertUrl).then(result => {
+        if (result.success) {
+          setCertificateUrl(result.signedUrl);
         }
-      }
-    };
-
-    fetchSignedUrl();
-    //we render when the review.isoCertUrl changes, but technically it shouldnt change anyways, so we can leave it empty? maybe
-  }, [review.isoCertUrl]);
+      }).catch(error => {
+        console.error('Error generating signed URL:', error);
+      });
+    }
+  }, [review.isoCertUrl, certificateUrl]);
  
   const YesNoBadge = ({ value }: { value: boolean }) => (
     <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
@@ -55,6 +50,24 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
     </div>
   );
 
+  const getRiskColor = (rating: string) => {
+    switch (rating) {
+      case 'LOW': return 'bg-green-100 text-green-800';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
+      case 'HIGH': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getMaturityColor = (rating: string) => {
+    switch (rating) {
+      case 'HIGH': return 'bg-green-100 text-green-800';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
+      case 'LOW': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
 
 
 
@@ -69,17 +82,40 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
               Completed on {new Date(review.createdAt).toLocaleDateString()}
             </p>
           </div>
-          {/* {review.reviewScore && (
-            <div className="text-center">
-              <div className="bg-background rounded-lg p-4 shadow-sm border">
-                <div className="text-2xl font-bold">{review.reviewScore}</div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide">Risk Score</div>
-                <div className={`mt-1 text-xs px-2 py-1 rounded-full ${riskLevel?.class}`}>
-                  {riskLevel?.text}
+          <div className="flex flex-col gap-2">
+            {review.riskRating && (
+              <div className="text-center">
+                <div className="bg-background rounded-lg p-3 shadow-sm border">
+                  <div className="text-sm text-muted-foreground uppercase tracking-wide mb-1">Risk Level</div>
+                  <Badge className={`text-sm px-3 py-1 font-semibold ${getRiskColor(review.riskRating)}`}>
+                    {review.riskRating}
+                  </Badge>
                 </div>
               </div>
+            )}
+            <div className="flex gap-2">
+              {review.maturityRating && (
+                <div className="text-center">
+                  <div className="bg-background rounded-lg p-2 shadow-sm border">
+                    <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Maturity</div>
+                    <Badge className={`text-xs px-2 py-1 font-semibold ${getMaturityColor(review.maturityRating)}`}>
+                      {review.maturityRating}
+                    </Badge>
+                  </div>
+                </div>
+              )}
+              {review.impactRating && (
+                <div className="text-center">
+                  <div className="bg-background rounded-lg p-2 shadow-sm border">
+                    <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Impact</div>
+                    <Badge className={`text-xs px-2 py-1 font-semibold ${getRiskColor(review.impactRating)}`}>
+                      {review.impactRating}
+                    </Badge>
+                  </div>
+                </div>
+              )}
             </div>
-          )} */}
+          </div>
         </div>
       </CardHeader>
 
@@ -92,9 +128,7 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
               <QuestionDisplay question="What is your company name?">
                 <AnswerDisplay value={review.companyName} />
               </QuestionDisplay>
-              <QuestionDisplay question="What industry are you in?">
-                <AnswerDisplay value={review.companyIndustry} />
-              </QuestionDisplay>
+
             </div>
             <div className="space-y-4">
               <QuestionDisplay question="When was this assessment completed?">
@@ -143,35 +177,57 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
 
        
         <div>
-          <CardTitle className="text-lg mb-4">Security Maturity Questions</CardTitle>
+          <CardTitle className="text-lg mb-4">Security Maturity Assessment</CardTitle>
           <div className="space-y-4">
-            <QuestionDisplay question="Do you use Single Sign-On (SSO)?">
+            <QuestionDisplay question="Do you use Single Sign-On (SSO) for your critical applications?">
               <YesNoBadge value={review.usesSSO} />
             </QuestionDisplay>
-            <QuestionDisplay question="Do you use Multi-Factor Authentication (MFA)?">
+            <QuestionDisplay question="Do you enforce Multi-Factor Authentication (MFA) on all user logins?">
               <YesNoBadge value={review.usesMFA} />
             </QuestionDisplay>
-            <QuestionDisplay question="Do you use individual accounts (no sharing)?">
+            <QuestionDisplay question="Are all users in your company assigned individual accounts (i.e. no shared credentials)?">
               <YesNoBadge value={review.individualAccounts} />
             </QuestionDisplay>
-            <QuestionDisplay question="Do you enforce role-based access controls?">
+            <QuestionDisplay question="Do you enforce Role-Based Access Control (or equivalent) on critical systems?">
               <YesNoBadge value={review.roleBasedAccess} />
             </QuestionDisplay>
+            <QuestionDisplay question="Do you maintain a formal, documented Information Security Management System?">
+              <YesNoBadge value={review.formalManagementSystem} />
+            </QuestionDisplay>
           </div>
-        </div>
-
-        {/* Additional Notes */}
-        {review.reviewNotes && (
-          <>
-            <Separator />
-            <div>
-              <CardTitle className="text-lg mb-4">Additional Information</CardTitle>
-              <QuestionDisplay question="Any additional notes or comments?">
-                <AnswerDisplay value={review.reviewNotes} />
+          {review.additionalNotesMaturity && (
+            <div className="mt-4">
+              <QuestionDisplay question="Additional Information about Security Maturity">
+                <AnswerDisplay value={review.additionalNotesMaturity} />
               </QuestionDisplay>
             </div>
-          </>
-        )}
+          )}
+        </div>
+
+        <Separator />
+
+        {/* Impact Assessment */}
+        <div>
+          <CardTitle className="text-lg mb-4">Impact Assessment</CardTitle>
+          <div className="space-y-4">
+            <QuestionDisplay question="Do you require access to Allnex information and/or personal data?">
+              <YesNoBadge value={review.requirePersonalData} />
+            </QuestionDisplay>
+            <QuestionDisplay question="Do you need access to Allnex internal or sensitive systems?">
+              <YesNoBadge value={review.requireSystemAccess} />
+            </QuestionDisplay>
+          </div>
+          {review.additionalNotesImpact && (
+            <div className="mt-4">
+              <QuestionDisplay question="Additional Information about Impacts">
+                <AnswerDisplay value={review.additionalNotesImpact} />
+              </QuestionDisplay>
+            </div>
+          )}
+        </div>
+
+
+       
       </CardContent>
     </Card>
   );

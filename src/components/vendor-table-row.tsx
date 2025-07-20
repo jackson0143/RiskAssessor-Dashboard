@@ -21,9 +21,12 @@ interface VendorTableRowProps {
     ownerName: string | null;
     status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
     website: string | null;
-    securityMaturity: string | null;
-    impact: string | null;
-    riskScore: number;
+    maturityScore: number | null;
+    maturityRating: string | null;
+    impactScore: number | null;
+    impactRating: string | null;
+    riskScore: number | null;
+    riskRating: string | null;
     category: string | null;
     description: string | null;
     lastReviewDate: Date | null;
@@ -33,16 +36,13 @@ interface VendorTableRowProps {
 }
 
 export function VendorTableRow({ vendor }: VendorTableRowProps) {
-  const getRiskLevel = (score: number) => {
-    if (score >= 80) return 'High';
-    if (score >= 60) return 'Medium';
-    return 'Low';
-  };
-
-  const getRiskBadgeVariant = (score: number) => {
-    if (score >= 80) return 'destructive';
-    if (score >= 60) return 'secondary';
-    return 'default';
+  const getRiskBadgeVariant = (rating: string | null) => {
+    switch (rating) {
+      case 'HIGH': return 'destructive';
+      case 'MEDIUM': return 'secondary';
+      case 'LOW': return 'default';
+      default: return 'outline';
+    }
   };
 
   const getStatusVariant = (status: 'ACTIVE' | 'INACTIVE' | 'PENDING') => {
@@ -112,8 +112,8 @@ export function VendorTableRow({ vendor }: VendorTableRowProps) {
 
       {/* Risk Level */}
       <TableCell>
-        <Badge variant={getRiskBadgeVariant(vendor.riskScore)}>
-          {getRiskLevel(vendor.riskScore)}
+        <Badge variant={getRiskBadgeVariant(vendor.riskRating)}>
+          {vendor.riskRating || "N/A"}
         </Badge>
       </TableCell>
 

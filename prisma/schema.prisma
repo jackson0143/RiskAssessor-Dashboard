@@ -110,7 +110,7 @@ model VendorReview {
 
   // Company Details 
   companyName     String?
-  companyIndustry String?
+
   
 
 
@@ -121,11 +121,24 @@ model VendorReview {
   isoCertExpiryDate DateTime?
   
 
+
+//impact 
+requirePersonalData Boolean @default(false)
+requireSystemAccess Boolean @default(false)
+additionalNotesImpact String?
+
+
+
+
+//Security Maturity
   usesSSO         Boolean     @default(false)
   usesMFA         Boolean     @default(false)
   individualAccounts Boolean  @default(false)
   roleBasedAccess Boolean     @default(false)
-  
+  formalManagementSystem Boolean @default(false)
+  additionalNotesMaturity String?
+
+
 
     riskScore Int? //0-100
   impactScore Int? //0-100

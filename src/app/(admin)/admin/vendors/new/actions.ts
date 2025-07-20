@@ -50,12 +50,16 @@ export async function addVendor(vendorData: {
         name: vendorData.name,
         ownerName: vendorData.ownerName || null,
         website: vendorData.website || null,
-        securityMaturity: vendorData.securityMaturity || null,
-        impact: vendorData.impact || null,
+        maturityScore: 0,
+        maturityRating: 'N/A',
+        impactScore: 0,
+        impactRating: 'N/A',
+        riskScore: 0,
+        riskRating: 'N/A',
         category: vendorData.category || null,
         description: vendorData.description || null,
         status: vendorData.status,
-        riskScore: 0, // Default value
+        
         contacts: {
           create: (() => {
             const contacts: Array<{
