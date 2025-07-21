@@ -236,7 +236,18 @@ export async function createForm(formData: FormData) {
         impactRating: impactResult.rating,
         riskRating: riskRating,
       }
+      
     });
+
+    await prisma.vendor.update({
+      where: {
+        id: vendor.id,
+      },
+      data : {
+        lastReviewDate: new Date(),
+        nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+      }
+    })
     
 
 
