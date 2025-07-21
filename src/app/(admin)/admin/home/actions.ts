@@ -25,6 +25,7 @@ export async function getDashboardStats() {
     highRiskVendorCount,
     mediumRiskVendorCount,
     lowRiskVendorCount,
+    totalUnassessedVendorCount,
     totalAssessedVendorCount,
     dueThisMonth,
   ] = await prisma.$transaction([
@@ -32,8 +33,9 @@ export async function getDashboardStats() {
     prisma.vendor.count({ where: { riskRating: "HIGH" } }),
     prisma.vendor.count({ where: { riskRating: "MEDIUM" } }),
     prisma.vendor.count({ where: { riskRating: "LOW" } }),
+    prisma.vendor.count({ where: { riskRating: "N/A" } }),
     prisma.vendor.count({
-      where: { riskRating: { not: null } },
+      where: { riskRating: { not: "N/A" } },
     }),
     prisma.vendor.count({
       where: { nextReviewDate: { gt: startOfMonth, lt: startOfNextMonth } },
@@ -49,8 +51,9 @@ export async function getDashboardStats() {
     highRiskVendorCount: highRiskVendorCount,
     mediumRiskVendorCount: mediumRiskVendorCount,
     lowRiskVendorCount: lowRiskVendorCount,
-    dueThisMonth: dueThisMonth,
+    totalUnassessedVendorCount: totalUnassessedVendorCount,
     totalAssessedVendorCount: totalAssessedVendorCount,
+    dueThisMonth: dueThisMonth,
     upcomingReviews: upcomingReviews,
   };
 }
