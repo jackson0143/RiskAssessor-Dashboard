@@ -36,12 +36,12 @@ interface VendorTableRowProps {
 }
 
 export function VendorTableRow({ vendor }: VendorTableRowProps) {
-  const getRiskBadgeVariant = (rating: string | null) => {
+  const getRiskBadgeColor = (rating: string | null) => {
     switch (rating) {
-      case 'HIGH': return 'destructive';
-      case 'MEDIUM': return 'secondary';
-      case 'LOW': return 'default';
-      default: return 'outline';
+      case 'HIGH': return 'bg-red-100 text-red-800';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
+      case 'LOW': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -112,7 +112,7 @@ export function VendorTableRow({ vendor }: VendorTableRowProps) {
 
       {/* Risk Level */}
       <TableCell>
-        <Badge variant={getRiskBadgeVariant(vendor.riskRating)}>
+        <Badge className={getRiskBadgeColor(vendor.riskRating)}>
           {vendor.riskRating || "N/A"}
         </Badge>
       </TableCell>
