@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Upload, Building, Shield, FileText, CheckCircle, ChevronDown, Check, AlertTriangle } from "lucide-react";
@@ -68,6 +69,7 @@ export default function FormsPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   // USEEFFECT 1 : search for vendors and debounce
@@ -116,41 +118,37 @@ export default function FormsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate required fields
-    if (!formData.companyName.trim()) {
-      alert("Please select a vendor name");
-      return;
-    }
-    
     setIsLoading(true);
+    setError(null);
     
-    const formDataToSubmit = new FormData();
-    formDataToSubmit.append("companyName", formData.companyName);
-    formDataToSubmit.append("hasISO27001", formData.hasISO27001.toString());
-    formDataToSubmit.append("iso27001ExpiryDate", formData.iso27001ExpiryDate);
-    formDataToSubmit.append("usesSSO", formData.usesSSO.toString());
-    formDataToSubmit.append("usesMFA", formData.usesMFA.toString());
-    formDataToSubmit.append("individualAccounts", formData.individualAccounts.toString());
-    formDataToSubmit.append("roleBasedAccess", formData.roleBasedAccess.toString());
-    formDataToSubmit.append("formalManagementSystem", formData.formalManagementSystem.toString());
-    formDataToSubmit.append("additionalNotesMaturity", formData.additionalNotesMaturity);
-    formDataToSubmit.append("requirePersonalData", formData.requirePersonalData.toString());
-    formDataToSubmit.append("requireSystemAccess", formData.requireSystemAccess.toString());
-    formDataToSubmit.append("additionalNotesImpact", formData.additionalNotesImpact);
-    
-    if (formData.iso27001File) {
-      formDataToSubmit.append("iso27001File", formData.iso27001File);
-    }
-    
-    try {
+        try {
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append("companyName", formData.companyName);
+      formDataToSubmit.append("hasISO27001", formData.hasISO27001.toString());
+      formDataToSubmit.append("iso27001ExpiryDate", formData.iso27001ExpiryDate);
+      formDataToSubmit.append("usesSSO", formData.usesSSO.toString());
+      formDataToSubmit.append("usesMFA", formData.usesMFA.toString());
+      formDataToSubmit.append("individualAccounts", formData.individualAccounts.toString());
+      formDataToSubmit.append("roleBasedAccess", formData.roleBasedAccess.toString());
+      formDataToSubmit.append("formalManagementSystem", formData.formalManagementSystem.toString());
+      formDataToSubmit.append("additionalNotesMaturity", formData.additionalNotesMaturity);
+      formDataToSubmit.append("requirePersonalData", formData.requirePersonalData.toString());
+      formDataToSubmit.append("requireSystemAccess", formData.requireSystemAccess.toString());
+      formDataToSubmit.append("additionalNotesImpact", formData.additionalNotesImpact);
+      
+      if (formData.iso27001File) {
+        formDataToSubmit.append("iso27001File", formData.iso27001File);
+      }
+      
       const result = await createForm(formDataToSubmit);
+      
       if (result.success && result.vendorId) {
         router.push(`/admin/vendors/${result.vendorId}`);
-      } 
-    } catch (error) {
-      console.error('Form submission error:', error);
-
+      } else {
+        setError(result.message || 'Failed to submit assessment. Please try again.');
+      }
+    } catch {
+      setError('An error occurred while submitting the assessment. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -167,6 +165,13 @@ export default function FormsPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
+   
+        {error && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
     
         <Card>
           <CardHeader>
@@ -249,25 +254,36 @@ export default function FormsPage() {
             {formData.hasISO27001 && (
               <div className="space-y-4 pl-6 border-l-2 border-gray-200">
                 <div className="space-y-2">
-                  <Label htmlFor="iso27001ExpiryDate">Certificate Expiry Date</Label>
+                  <Label htmlFor="iso27001ExpiryDate">
+                    Certificate Expiry Date *
+                  </Label>
                   <Input
                     id="iso27001ExpiryDate"
                     type="date"
                     value={formData.iso27001ExpiryDate}
                     onChange={(e) => handleInputChange("iso27001ExpiryDate", e.target.value)}
+                    required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="iso27001File">Upload ISO-27001 Certificate</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <Label htmlFor="iso27001File">
+                    Upload ISO-27001 Certificate *
+                  </Label>
+                  <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
+                    formData.iso27001File 
+                      ? 'border-green-300 bg-green-50' 
+                      : 'border-gray-300 bg-gray-50'
+                  }`}>
                     <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                     <input
                       id="iso27001File"
+                      name="iso27001File"
                       type="file"
                       accept=".pdf,.jpg,.jpeg,.png"
                       onChange={handleFileChange}
                       className="hidden"
+                      required
                     />
                     <label htmlFor="iso27001File" className="cursor-pointer">
                       <span className="text-primary hover:text-primary/80 font-medium">

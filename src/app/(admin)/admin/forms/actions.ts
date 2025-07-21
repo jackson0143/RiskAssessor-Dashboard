@@ -33,7 +33,7 @@ function getMaturityRating(securityFields: {
   let rating: 'LOW' | 'MEDIUM' | 'HIGH';
   if (score > 80) {
     rating = 'HIGH';
-  } else if (score >= 50) {
+  } else if (score >= 60) {
     rating = 'MEDIUM';
   } else {
     rating = 'LOW';
@@ -136,8 +136,25 @@ export async function createForm(formData: FormData) {
     const requirePersonalData = formData.get("requirePersonalData") === "true";
     const requireSystemAccess = formData.get("requireSystemAccess") === "true";
     const additionalNotesImpact = formData.get("additionalNotesImpact") as string;
+
+    if (!companyName || !companyName.trim()) {
+      return { success: false, message: 'Please select a vendor name' };
+    }
     
-    // Handle file upload of ISO27001 cert 
+
+    if (hasISO27001) {
+      const iso27001File = formData.get("iso27001File") as File;
+      if (!iso27001File || iso27001File.size === 0) {
+        return { success: false, message: 'Please upload your ISO-27001 certificate' };
+      }
+    }
+    
+
+    if (hasISO27001 && !iso27001ExpiryDate) {
+      return { success: false, message: 'Please provide the certificate expiry date' };
+    }
+    
+
     let isoCertFilePath: string | null = null;
     if (hasISO27001) {
       const iso27001File = formData.get("iso27001File") as File;
@@ -253,12 +270,11 @@ export async function createForm(formData: FormData) {
 
     revalidatePath('/admin/vendors');
 
-    
-    return { success: true, vendorId: vendor.id };
+    return { success: true, message: 'Assessment submitted successfully', vendorId: vendor.id };
     
   } catch (error) {
     console.error('Form submission error:', error);
-    throw new Error('Failed to submit form');
+    return { success: false, message: 'Failed to submit form. Please try again.' };
   }
 }
     
