@@ -27,16 +27,18 @@ interface FormData {
   iso27001ExpiryDate: string;
   
   // Security Maturity
-  usesSSO: boolean;
+  performsVulnerabilityScan: boolean;
   usesMFA: boolean;
-  individualAccounts: boolean;
-  roleBasedAccess: boolean;
-  formalManagementSystem: boolean;
+  usesAutomatedAccessControl: boolean;
+  maintainsIncidentResponsePlan: boolean;
   additionalNotesMaturity: string;
   
   // Impact Assessment
+  requireOperationData: boolean;
+  requireFinancialData: boolean;
   requirePersonalData: boolean;
-  requireSystemAccess: boolean;
+  canCauseBusinessOutage: boolean;
+  roleBasedAccess: boolean;
   additionalNotesImpact: string;
 }
 
@@ -52,14 +54,16 @@ export default function FormsPage() {
     hasISO27001: false,
     iso27001File: null,
     iso27001ExpiryDate: "",
-    usesSSO: false,
+    performsVulnerabilityScan: false,
     usesMFA: false,
-    individualAccounts: false,
-    roleBasedAccess: false,
-    formalManagementSystem: false,
+    usesAutomatedAccessControl: false,
+    maintainsIncidentResponsePlan: false,
     additionalNotesMaturity: "",
+    requireOperationData: false,
+    requireFinancialData: false,
     requirePersonalData: false,
-    requireSystemAccess: false,
+    canCauseBusinessOutage: false,
+    roleBasedAccess: false,
     additionalNotesImpact: "",
   });
 
@@ -126,14 +130,16 @@ export default function FormsPage() {
       formDataToSubmit.append("companyName", formData.companyName);
       formDataToSubmit.append("hasISO27001", formData.hasISO27001.toString());
       formDataToSubmit.append("iso27001ExpiryDate", formData.iso27001ExpiryDate);
-      formDataToSubmit.append("usesSSO", formData.usesSSO.toString());
+      formDataToSubmit.append("performsVulnerabilityScan", formData.performsVulnerabilityScan.toString());
       formDataToSubmit.append("usesMFA", formData.usesMFA.toString());
-      formDataToSubmit.append("individualAccounts", formData.individualAccounts.toString());
-      formDataToSubmit.append("roleBasedAccess", formData.roleBasedAccess.toString());
-      formDataToSubmit.append("formalManagementSystem", formData.formalManagementSystem.toString());
+      formDataToSubmit.append("usesAutomatedAccessControl", formData.usesAutomatedAccessControl.toString());
+      formDataToSubmit.append("maintainsIncidentResponsePlan", formData.maintainsIncidentResponsePlan.toString());
       formDataToSubmit.append("additionalNotesMaturity", formData.additionalNotesMaturity);
+      formDataToSubmit.append("requireOperationData", formData.requireOperationData.toString());
+      formDataToSubmit.append("requireFinancialData", formData.requireFinancialData.toString());
       formDataToSubmit.append("requirePersonalData", formData.requirePersonalData.toString());
-      formDataToSubmit.append("requireSystemAccess", formData.requireSystemAccess.toString());
+      formDataToSubmit.append("canCauseBusinessOutage", formData.canCauseBusinessOutage.toString());
+      formDataToSubmit.append("roleBasedAccess", formData.roleBasedAccess.toString());
       formDataToSubmit.append("additionalNotesImpact", formData.additionalNotesImpact);
       
       if (formData.iso27001File) {
@@ -326,12 +332,12 @@ export default function FormsPage() {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="usesSSO"
-                  checked={formData.usesSSO}
-                  onCheckedChange={(checked: boolean) => handleInputChange("usesSSO", checked)}
+                  id="performsVulnerabilityScan"
+                  checked={formData.performsVulnerabilityScan}
+                  onCheckedChange={(checked: boolean) => handleInputChange("performsVulnerabilityScan", checked)}
                 />
-                <Label htmlFor="usesSSO" className="text-base">
-                Do you use Single Sign-On (SSO) for your critical applications?
+                <Label htmlFor="performsVulnerabilityScan" className="text-base">
+                Do you perform vulnerability scans or penetration tests at least quarterly?
                 </Label>
               </div>
 
@@ -342,40 +348,29 @@ export default function FormsPage() {
                   onCheckedChange={(checked: boolean) => handleInputChange("usesMFA", checked)}
                 />
                 <Label htmlFor="usesMFA" className="text-base">
-                Do you enforce Multi-Factor Authentication (MFA) on all user logins?
+                Do you enforce multi-factor authentication (MFA) for all user logins?
                 </Label>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="individualAccounts"
-                  checked={formData.individualAccounts}
-                  onCheckedChange={(checked: boolean) => handleInputChange("individualAccounts", checked)}
+                  id="usesAutomatedAccessControl"
+                  checked={formData.usesAutomatedAccessControl}
+                  onCheckedChange={(checked: boolean) => handleInputChange("usesAutomatedAccessControl", checked)}
                 />
-                <Label htmlFor="individualAccounts" className="text-base">
-                Are all users in your company assigned individual accounts (i.e. no shared credentials)?
+                <Label htmlFor="usesAutomatedAccessControl" className="text-base">
+                Do you use automated role-based (or attribute-based) access controls with regular audits?
                 </Label>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="roleBasedAccess"
-                  checked={formData.roleBasedAccess}
-                  onCheckedChange={(checked: boolean) => handleInputChange("roleBasedAccess", checked)}
+                  id="maintainsIncidentResponsePlan"
+                  checked={formData.maintainsIncidentResponsePlan}
+                  onCheckedChange={(checked: boolean) => handleInputChange("maintainsIncidentResponsePlan", checked)}
                 />
-                <Label htmlFor="roleBasedAccess" className="text-base">
-                Do you enforce Role-Based Access Control (or equivalent) on critical systems?
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="formalManagementSystem"
-                  checked={formData.formalManagementSystem}
-                  onCheckedChange={(checked: boolean) => handleInputChange("formalManagementSystem", checked)}
-                />
-                <Label htmlFor="formalManagementSystem" className="text-base">
-                Do you maintain a formal, documented Information Security Management System?
+                <Label htmlFor="maintainsIncidentResponsePlan" className="text-base">
+                Do you maintain a documented Incident Response Plan that&apos;s been tested within the last 12 months?
                 </Label>
               </div>
 
@@ -411,23 +406,56 @@ export default function FormsPage() {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="requirePersonalData"
-                  checked={formData.requirePersonalData}
-                  onCheckedChange={(checked: boolean) => handleInputChange("requirePersonalData", checked)}
+                  id="requireOperationData"
+                  checked={formData.requireOperationData}
+                  onCheckedChange={(checked: boolean) => handleInputChange("requireOperationData", checked)}
                 />
-                <Label htmlFor="requirePersonalData" className="text-base">
-                  Do you require access to Allnex information and/or personal data?
+                <Label htmlFor="requireOperationData" className="text-base">
+                  Do you process or store real-time operational or production-control data for Allnex?
                 </Label>
               </div>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="requireSystemAccess"
-                  checked={formData.requireSystemAccess}
-                  onCheckedChange={(checked: boolean) => handleInputChange("requireSystemAccess", checked)}
+                  id="requireFinancialData"
+                  checked={formData.requireFinancialData}
+                  onCheckedChange={(checked: boolean) => handleInputChange("requireFinancialData", checked)}
                 />
-                <Label htmlFor="requireSystemAccess" className="text-base">
-                  Do you need access to Allnex internal or sensitive systems?
+                <Label htmlFor="requireFinancialData" className="text-base">
+                  Do you process or store financial records or proprietary intellectual property?
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="requirePersonalData"
+                  checked={formData.requirePersonalData}
+                  onCheckedChange={(checked: boolean) => handleInputChange("requirePersonalData", checked)}
+                />
+                <Label htmlFor="requirePersonalData" className="text-base">
+                  Do you process or store employee or customer personally identifiable information?
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="canCauseBusinessOutage"
+                  checked={formData.canCauseBusinessOutage}
+                  onCheckedChange={(checked: boolean) => handleInputChange("canCauseBusinessOutage", checked)}
+                />
+                <Label htmlFor="canCauseBusinessOutage" className="text-base">
+                  Could an interruption to your service cause a material business outage at Allnex?
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="roleBasedAccess"
+                  checked={formData.roleBasedAccess}
+                  onCheckedChange={(checked: boolean) => handleInputChange("roleBasedAccess", checked)}
+                />
+                <Label htmlFor="roleBasedAccess" className="text-base">
+                  Do you enforce Role-Based Access Control (or equivalent) on critical systems?
                 </Label>
               </div>
 

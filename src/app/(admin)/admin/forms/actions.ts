@@ -10,21 +10,19 @@ const prisma = new PrismaClient();
 //MATURITY RATING
 function getMaturityRating(securityFields: {
   hasISO27001: boolean;
-  usesSSO: boolean;
+  performsVulnerabilityScan: boolean;
   usesMFA: boolean;
-  individualAccounts: boolean;
-  roleBasedAccess: boolean;
-  formalManagementSystem: boolean;
+  usesAutomatedAccessControl: boolean;
+  maintainsIncidentResponsePlan: boolean;
 }): { score: number; rating: 'LOW' | 'MEDIUM' | 'HIGH' } {
   let score = 100; // Start with 100
   
 
   if (!securityFields.hasISO27001) score -= 20; // ISO27001 subtracts 20
-  if (!securityFields.usesSSO) score -= 5;
+  if (!securityFields.performsVulnerabilityScan) score -= 5;
   if (!securityFields.usesMFA) score -= 5;
-  if (!securityFields.individualAccounts) score -= 5;
-  if (!securityFields.roleBasedAccess) score -= 5;
-  if (!securityFields.formalManagementSystem) score -= 5;
+  if (!securityFields.usesAutomatedAccessControl) score -= 5;
+  if (!securityFields.maintainsIncidentResponsePlan) score -= 5;
   
 
   score = Math.max(0, score);
@@ -44,13 +42,19 @@ function getMaturityRating(securityFields: {
 
 
 function getImpactRating(impactFields: {
+  requireOperationData: boolean;
+  requireFinancialData: boolean;
   requirePersonalData: boolean;
-  requireSystemAccess: boolean;
+  canCauseBusinessOutage: boolean;
+  roleBasedAccess: boolean;
 }): { score: number; rating: 'LOW' | 'MEDIUM' | 'HIGH' } {
   let score = 100;
   
+  if (impactFields.requireOperationData) score -= 20;
+  if (impactFields.requireFinancialData) score -= 20;
   if (impactFields.requirePersonalData) score -= 20;
-  if (impactFields.requireSystemAccess) score -= 20;
+  if (impactFields.canCauseBusinessOutage) score -= 20;
+  if (!impactFields.roleBasedAccess) score -= 20;
   
   score = Math.max(0, score);
   
@@ -127,14 +131,16 @@ export async function createForm(formData: FormData) {
     const companyName = formData.get("companyName") as string;
     const hasISO27001 = formData.get("hasISO27001") === "true";
     const iso27001ExpiryDate = formData.get("iso27001ExpiryDate") as string;
-    const usesSSO = formData.get("usesSSO") === "true";
+    const performsVulnerabilityScan = formData.get("performsVulnerabilityScan") === "true";
     const usesMFA = formData.get("usesMFA") === "true";
-    const individualAccounts = formData.get("individualAccounts") === "true";
-    const roleBasedAccess = formData.get("roleBasedAccess") === "true";
-    const formalManagementSystem = formData.get("formalManagementSystem") === "true";
+    const usesAutomatedAccessControl = formData.get("usesAutomatedAccessControl") === "true";
+    const maintainsIncidentResponsePlan = formData.get("maintainsIncidentResponsePlan") === "true";
     const additionalNotesMaturity = formData.get("additionalNotesMaturity") as string;
+    const requireOperationData = formData.get("requireOperationData") === "true";
+    const requireFinancialData = formData.get("requireFinancialData") === "true";
     const requirePersonalData = formData.get("requirePersonalData") === "true";
-    const requireSystemAccess = formData.get("requireSystemAccess") === "true";
+    const canCauseBusinessOutage = formData.get("canCauseBusinessOutage") === "true";
+    const roleBasedAccess = formData.get("roleBasedAccess") === "true";
     const additionalNotesImpact = formData.get("additionalNotesImpact") as string;
 
     if (!companyName || !companyName.trim()) {
@@ -186,17 +192,19 @@ export async function createForm(formData: FormData) {
     // calculate maturity rating
     const maturityResult = getMaturityRating({
       hasISO27001,
-      usesSSO,
+      performsVulnerabilityScan,
       usesMFA,
-      individualAccounts,
-      roleBasedAccess,
-      formalManagementSystem
+      usesAutomatedAccessControl,
+      maintainsIncidentResponsePlan
     });
 
     // calculate impact rating
     const impactResult = getImpactRating({
+      requireOperationData,
+      requireFinancialData,
       requirePersonalData,
-      requireSystemAccess
+      canCauseBusinessOutage,
+      roleBasedAccess
     });
 
     // calculate overall risk rating
@@ -220,15 +228,17 @@ export async function createForm(formData: FormData) {
         
 
         //impact stuff
+        requireOperationData: requireOperationData,
+        requireFinancialData: requireFinancialData,
         requirePersonalData: requirePersonalData,
-        requireSystemAccess: requireSystemAccess,
+        canCauseBusinessOutage: canCauseBusinessOutage,
+        roleBasedAccess: roleBasedAccess,
         
         // Security Maturity stuff
-        usesSSO: usesSSO,
+        performsVulnerabilityScan: performsVulnerabilityScan,
         usesMFA: usesMFA,
-        individualAccounts: individualAccounts,
-        roleBasedAccess: roleBasedAccess,
-        formalManagementSystem: formalManagementSystem,
+        usesAutomatedAccessControl: usesAutomatedAccessControl,
+        maintainsIncidentResponsePlan: maintainsIncidentResponsePlan,
         
 
         //Additional Info

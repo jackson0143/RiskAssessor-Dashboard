@@ -179,20 +179,17 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
         <div>
           <CardTitle className="text-lg mb-4">Security Maturity Assessment</CardTitle>
           <div className="space-y-4">
-            <QuestionDisplay question="Do you use Single Sign-On (SSO) for your critical applications?">
-              <YesNoBadge value={review.usesSSO} />
+            <QuestionDisplay question="Do you perform vulnerability scans or penetration tests at least quarterly?">
+              <YesNoBadge value={review.performsVulnerabilityScan} />
             </QuestionDisplay>
-            <QuestionDisplay question="Do you enforce Multi-Factor Authentication (MFA) on all user logins?">
+            <QuestionDisplay question="Do you enforce multi-factor authentication (MFA) for all user logins?">
               <YesNoBadge value={review.usesMFA} />
             </QuestionDisplay>
-            <QuestionDisplay question="Are all users in your company assigned individual accounts (i.e. no shared credentials)?">
-              <YesNoBadge value={review.individualAccounts} />
+            <QuestionDisplay question="Do you use automated role-based (or attribute-based) access controls with regular audits?">
+              <YesNoBadge value={review.usesAutomatedAccessControl} />
             </QuestionDisplay>
-            <QuestionDisplay question="Do you enforce Role-Based Access Control (or equivalent) on critical systems?">
-              <YesNoBadge value={review.roleBasedAccess} />
-            </QuestionDisplay>
-            <QuestionDisplay question="Do you maintain a formal, documented Information Security Management System?">
-              <YesNoBadge value={review.formalManagementSystem} />
+            <QuestionDisplay question="Do you maintain a documented Incident Response Plan that&apos;s been tested within the last 12 months?">
+              <YesNoBadge value={review.maintainsIncidentResponsePlan} />
             </QuestionDisplay>
           </div>
           {review.additionalNotesMaturity && (
@@ -210,11 +207,20 @@ export function VendorReviewCard({ review }: VendorReviewCardProps) {
         <div>
           <CardTitle className="text-lg mb-4">Impact Assessment</CardTitle>
           <div className="space-y-4">
-            <QuestionDisplay question="Do you require access to Allnex information and/or personal data?">
+            <QuestionDisplay question="Do you process or store real-time operational or production-control data for Allnex?">
+              <YesNoBadge value={review.requireOperationData} />
+            </QuestionDisplay>
+            <QuestionDisplay question="Do you process or store financial records or proprietary intellectual property?">
+              <YesNoBadge value={review.requireFinancialData} />
+            </QuestionDisplay>
+            <QuestionDisplay question="Do you process or store employee or customer personally identifiable information?">
               <YesNoBadge value={review.requirePersonalData} />
             </QuestionDisplay>
-            <QuestionDisplay question="Do you need access to Allnex internal or sensitive systems?">
-              <YesNoBadge value={review.requireSystemAccess} />
+            <QuestionDisplay question="Could an interruption to your service cause a material business outage at Allnex?">
+              <YesNoBadge value={review.canCauseBusinessOutage} />
+            </QuestionDisplay>
+            <QuestionDisplay question="Do you enforce Role-Based Access Control (or equivalent) on critical systems?">
+              <YesNoBadge value={review.roleBasedAccess} />
             </QuestionDisplay>
           </div>
           {review.additionalNotesImpact && (

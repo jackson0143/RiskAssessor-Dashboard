@@ -28,11 +28,10 @@ interface VendorReview {
   hasISO27001: boolean;
   isoCertUrl: string | null;
   isoCertExpiryDate: Date | null;
-  usesSSO: boolean;
+  performsVulnerabilityScan: boolean;
   usesMFA: boolean;
-  individualAccounts: boolean;
-  roleBasedAccess: boolean;
-  formalManagementSystem: boolean;
+  usesAutomatedAccessControl: boolean;
+  maintainsIncidentResponsePlan: boolean;
   riskScore: number | null;
   impactScore: number | null;
   maturityScore: number | null;
@@ -40,8 +39,11 @@ interface VendorReview {
   maturityRating: string | null;
   impactRating: string | null;
   additionalNotesMaturity: string | null;
+  requireOperationData: boolean;
+  requireFinancialData: boolean;
   requirePersonalData: boolean;
-  requireSystemAccess: boolean;
+  canCauseBusinessOutage: boolean;
+  roleBasedAccess: boolean;
   additionalNotesImpact: string | null;
   createdAt: Date;
   updatedAt: Date;

@@ -4,7 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,7 +13,7 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-        
+
 enum ReviewStatus {
   DRAFT
   COMPLETED
@@ -44,117 +43,106 @@ enum VendorStatus {
 }
 
 model Contact {
-  id        String      @id @default(uuid()) @db.Uuid
-  name      String
-  email     String
-  phone     String?
-  role      String?
+  id         String      @id @default(uuid()) @db.Uuid
+  name       String
+  email      String
+  phone      String?
+  role       String?
   department String?
-  type      ContactType
-  
+  type       ContactType
+
   // Relations
-  vendorId  String      @db.Uuid
-  vendor    Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  vendorId String @db.Uuid
+  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([vendorId, type]) // This should make it so that there can only be one primary and one secondary contact per vendor
 }
 
 model Vendor {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String       @id @default(uuid()) @db.Uuid
   name      String
-  ownerName     String?
-  status VendorStatus @default(PENDING)
+  ownerName String?
+  status    VendorStatus @default(PENDING)
 
-  website   String?
- 
-  riskScore Int? //0-100
-  impactScore Int? //0-100
+  website String?
+
+  riskScore     Int? //0-100
+  impactScore   Int? //0-100
   maturityScore Int? //0-100
 
-  riskRating String? //LOW, MEDIUM, HIGH
+  riskRating     String? //LOW, MEDIUM, HIGH
   maturityRating String? //LOW, MEDIUM, HIGH
-  impactRating String? //LOW, MEDIUM, HIGH
+  impactRating   String? //LOW, MEDIUM, HIGH
 
-  category String?
-  description String?
+  category       String?
+  description    String?
   lastReviewDate DateTime?
   nextReviewDate DateTime?
 
-  
   // Relations
-  contacts      Contact[]
-  reviews       VendorReview[]
-  
+  contacts Contact[]
+  reviews  VendorReview[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model VendorReview {
-  id              String      @id @default(uuid()) @db.Uuid
-  vendorId        String      @db.Uuid  
-  vendor          Vendor      @relation(fields: [vendorId], references: [id])
-  
+  id       String @id @default(uuid()) @db.Uuid
+  vendorId String @db.Uuid
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
   // Review stuff
-  status          ReviewStatus @default(DRAFT)
-  lastReviewDate  DateTime
-  nextReviewDate  DateTime
-  reviewNotes     String?
-  
+  status         ReviewStatus @default(DRAFT)
+  lastReviewDate DateTime
+  nextReviewDate DateTime
+  reviewNotes    String?
+
   //////////////////////////////
   //FORM STUFF
   //////////////////////////////
 
-
   // Company Details 
-  companyName     String?
-
-  
-
-
+  companyName String?
 
   // ISO-27001 Certification
-  hasISO27001     Boolean     @default(false)
-  isoCertUrl      String?     // URL to uploaded certificate
+  hasISO27001       Boolean   @default(false)
+  isoCertUrl        String? // URL to uploaded certificate
   isoCertExpiryDate DateTime?
-  
 
+  //impact 
+  requireOperationData   Boolean @default(false)
+  requireFinancialData   Boolean @default(false)
+  requirePersonalData    Boolean @default(false)
+  canCauseBusinessOutage Boolean @default(false)
+  roleBasedAccess        Boolean @default(false)
+  additionalNotesImpact  String?
 
-//impact 
-requirePersonalData Boolean @default(false)
-requireSystemAccess Boolean @default(false)
-additionalNotesImpact String?
+  //Security Maturity
+  performsVulnerabilityScan     Boolean @default(false)
+  usesMFA                       Boolean @default(false)
 
+  usesAutomatedAccessControl    Boolean @default(false)
+  maintainsIncidentResponsePlan Boolean @default(false)
+  additionalNotesMaturity       String?
 
-
-
-//Security Maturity
-  usesSSO         Boolean     @default(false)
-  usesMFA         Boolean     @default(false)
-  individualAccounts Boolean  @default(false)
-  roleBasedAccess Boolean     @default(false)
-  formalManagementSystem Boolean @default(false)
-  additionalNotesMaturity String?
-
-
-
-    riskScore Int? //0-100
-  impactScore Int? //0-100
+  riskScore     Int? //0-100
+  impactScore   Int? //0-100
   maturityScore Int? //0-100
 
-  riskRating String? //LOW, MEDIUM, HIGH
+  riskRating     String? //LOW, MEDIUM, HIGH
   maturityRating String? //LOW, MEDIUM, HIGH
-  impactRating String? //LOW, MEDIUM, HIGH
+  impactRating   String? //LOW, MEDIUM, HIGH
 
   // Timestamps
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  answers         Answer[]
+  answers Answer[]
 }
-
 
 ////////////////////////////////////////////////////////////
 //THIS IS A FUTURE FEATURE FOR DYNAMIC AND FLEXIBLE FORMS
@@ -165,46 +153,46 @@ model Question {
   questionType QuestionType
   weight       Int          @default(1)
   isMandatory  Boolean      @default(false)
-  options      String[]     // For multiple choice questions, if not then just pass in []
-  isActive     Boolean      @default(true)  // To softdelete in case in the future we want to look back at old questions
+  options      String[] // For multiple choice questions, if not then just pass in []
+  isActive     Boolean      @default(true) // To softdelete in case in the future we want to look back at old questions
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  answers      Answer[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  answers   Answer[]
 }
+
 //THIS IS A FUTURE FEATURE FOR DYNAMIC AND FLEXIBLE FORMS
 model Answer {
-  id         String   @id @default(uuid()) @db.Uuid
-  reviewId   String   @db.Uuid  
-  review     VendorReview @relation(fields: [reviewId], references: [id])
-  score      Int?
+  id       String       @id @default(uuid()) @db.Uuid
+  reviewId String       @db.Uuid
+  review   VendorReview @relation(fields: [reviewId], references: [id])
+  score    Int?
 
-  questionId String   @db.Uuid  
+  questionId String   @db.Uuid
   question   Question @relation(fields: [questionId], references: [id])
-  
 
   //NOTE: In the future can probably use JSON to store complex answer format, but for now using nullable fields is fine. Queries will be a bit more complex.
-   // For SINGLE_CHOICE
+  // For SINGLE_CHOICE
   selectedOptionId String?
 
   // For MULTIPLE_CHOICE
   selectedOptionIds String[]
 
   // For TEXT
-  textValue      String?
+  textValue String?
 
   // For NUMERIC
-  numericValue   Float?
+  numericValue Float?
 
   // For FILE_UPLOAD
-  fileUrl        String?
+  fileUrl String?
 
   // For DATE
-  dateValue      DateTime?
+  dateValue DateTime?
 
   // For BOOLEAN
-  booleanValue   Boolean?
+  booleanValue Boolean?
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
