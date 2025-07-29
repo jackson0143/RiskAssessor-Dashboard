@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Clock, Users, AlertTriangle, Calendar } from "lucide-react";
+import { Users, AlertTriangle, Calendar } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { getDashboardStats } from "./actions";
 import { Eye } from "lucide-react";
@@ -40,7 +40,7 @@ export default async function HomePage() {
 
       {/* Stats Cards */}
       {/*Grid of 4 cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Vendors</CardTitle>
@@ -48,7 +48,12 @@ export default async function HomePage() {
           </CardHeader>
           <CardContent>
             {stats.totalVendors ? (
-              <div className="text-2xl font-bold">{stats.totalVendors}</div>
+              <>
+                <div className="text-2xl font-bold">{stats.totalVendors}</div>
+                <p className="text-xs text-muted-foreground">
+                  {stats.totalUnassessedVendorCount} unassessed vendors
+                </p>
+              </>
             ) : (
               <>
                 <div className="text-2xl font-bold">0</div>
@@ -58,7 +63,7 @@ export default async function HomePage() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Active Assessments
@@ -69,7 +74,7 @@ export default async function HomePage() {
             <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">0% completion rate</p>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -85,7 +90,7 @@ export default async function HomePage() {
                   {stats.highRiskVendorCount}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Requires attention
+                  Require attention
                 </p>
               </>
             ) : (
@@ -129,7 +134,7 @@ export default async function HomePage() {
         <CardHeader>
           <CardTitle>Risk Distribution</CardTitle>
           <CardDescription>
-            Current risk levels across all vendors
+            Current risk levels across all assessed vendors
           </CardDescription>
         </CardHeader>
         <CardContent>
