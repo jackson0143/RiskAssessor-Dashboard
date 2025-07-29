@@ -34,6 +34,27 @@ just create your .env file there and paste in the DB key
 
 (please message me if you need help on this step)
 
+```bash
+#DB CONNECTIONS, use any but in this case I used Supabase for ease
+# Connect to Supabase via connection pooling
+DATABASE_URL=""
+# Direct connection to the database. Used for migrations
+DIRECT_URL=""
+
+#Clerk keys here, can be found in the Clerk setup page
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+
+
+# Found in Supabase connection settings
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
 
 ## Setting up the PostgreSQL using Prisma
 This should already be setup using the setup commands above, but if you come across any issues (such as migrations), please let me know and I will configure the setup scripts. 
